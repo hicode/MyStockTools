@@ -27,7 +27,18 @@ namespace AnalyzePastData
             InitializeComponent();
         }
 
+
         private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void WriteStocksToSelfblock(IEnumerable<Stock> stocks)
+        {
+            
+        }
+
+        private void ParseHistoryFilesToOneFile()
         {
             BufferedStream target = new BufferedStream(new FileStream(@"G:\StockData\history.txt", FileMode.Create, FileAccess.Write));
             BinaryWriter bw = new BinaryWriter(target);
