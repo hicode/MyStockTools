@@ -30,12 +30,40 @@ namespace AnalyzePastData
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-
+            Stock[] s = { new Stock("300124", "zgsh"), new Stock("600028", "kkkk") };
+            WriteStocksToSelfblock(s);
         }
 
         private void WriteStocksToSelfblock(IEnumerable<Stock> stocks)
         {
-            
+            StringBuilder newStr = new StringBuilder();
+            string file = @"D:\eastmoney\swc8\config\User\m5604094268132944\StockwayStock.ini";
+            BufferedStream before = new BufferedStream(new FileStream(file, FileMode.Open, FileAccess.Read));
+            StreamReader sr = new StreamReader(before);
+            while (true)
+            {
+                string str = sr.ReadLine();
+                if (str.Length >= 5 && str.Substring(0, 5) == "自选股9=") break;
+                newStr.Append(str);
+                newStr.Append("\r\n");
+            }
+            newStr.Append("自选股9=");
+            foreach (var item in stocks)
+            {
+                int x = int.Parse(item.Code);
+                if (x > 400000) newStr.Append("1.");
+                else newStr.Append("0.");
+                newStr.Append(item.Code + ",");
+            }
+            newStr.Append("\r\n");
+            sr.Close();
+            before.Close();
+            BufferedStream after = new BufferedStream(new FileStream(file, FileMode.Create, FileAccess.Write));
+            StreamWriter sw = new StreamWriter(after, Encoding.Unicode);
+            sw.Write(newStr);
+            sw.Flush();
+            sw.Close();
+            after.Close();
         }
 
         private void ParseHistoryFilesToOneFile()

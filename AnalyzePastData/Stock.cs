@@ -22,13 +22,19 @@ namespace AnalyzePastData
         public string Name { get; private set; }
         public List<DayLine> DayLines { get; set; }
 
+        public Stock(string code, string name)
+        {
+            Code = code;
+            Name = name;
+            DayLines = new List<DayLine>();
+        }
 
         public int CompareTo(Stock other)
         {
             int a = int.Parse(this.Code);
             int b = int.Parse(other.Code);
-            if (a < 100000 && b > 100000) return 1;
-            if (a > 100000 && b < 100000) return -1;
+            if (a < 400000 && b > 400000) return 1;
+            if (a > 400000 && b < 400000) return -1;
             return a - b;
         }
     }
