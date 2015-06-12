@@ -15,7 +15,19 @@ namespace AnalyzePastData
         public float Low;
         public uint Turnover;
         public double Volume;
+
+        public DayLine(uint date, float open, float close, float high, float low, uint turnover, double volume)
+        {
+            Date = date;
+            Open = open;
+            Close = close;
+            High = high;
+            Low = low;
+            Turnover = turnover;
+            Volume = volume;
+        }
     }
+
     class Stock : IComparable<Stock>
     {
         public string Code { get; private set; }
