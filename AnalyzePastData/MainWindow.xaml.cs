@@ -31,11 +31,21 @@ namespace AnalyzePastData
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             List<Stock> stocks = getStocks();
-            var selectedStocks = from s in stocks
-                                 where uint.Parse(s.Code) > 2000 && uint.Parse(s.Code) < 2200
-                                 select s;
-            WriteStocksToSelfblock(selectedStocks);
-            MessageBox.Show("Done");
+            var result = new List<Stock>();
+            AnalyzeStocks analyze = new AnalyzeStocks(stocks);
+            uint startDate = analyze.DateToUint(2008, 7, 1);
+            uint endDate = analyze.DateToUint(2015, 6, 9);
+            float per = analyze.UpDownUp(startDate, endDate, true, 2, (float)0.10, 0, (float)-0.05, 2, (float)-0.02);
+            //uint startDate = analyze.DateToUint(2011, 1, 1);
+            //uint endDate = analyze.DateToUint(2015, 6, 9);
+            //Stock s = null;
+            //foreach (var item in stocks)
+            //{
+            //    if (item.Code == "300033") { s = item; break; }
+            //}
+            //var list = analyze.getNDayLimitUp(s, 2, startDate, endDate, true);
+
+            MessageBox.Show(per.ToString());
         }
 
         private List<Stock> getStocks()
@@ -80,6 +90,7 @@ namespace AnalyzePastData
                         float close = br.ReadSingle();
                         uint turnover = br.ReadUInt32();
                         double volume = br.ReadDouble();
+                        if (turnover == 0) continue;
                         stock.DayLines.Add(new DayLine(date, open, close, high, low, turnover, volume));
                     }
                     list.Add(stock);
