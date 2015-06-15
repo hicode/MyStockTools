@@ -20,7 +20,7 @@ namespace AnalyzePastData
             this.stocks = getStocks();
         }
 
-        public float UpDownOpen(uint startDate, uint endDate, bool limitUp, int nUp, float upPercent, int nDown, float downPercent, int hold, float targetPercent)
+        public float UpDownOpen(bool limitUp, int nUp, float upPercent, int nDown, float downPercent, int hold, float targetPercent)
         {
             int pre = 0;
             int post = 0;
@@ -29,11 +29,6 @@ namespace AnalyzePastData
                 List<int> indexes = new List<int>();
                 if (limitUp) indexes = getNDayLimitUp(stock, nUp, false);
                 else indexes = getNDayUp(stock, nUp, upPercent);
-                //List<int> preConditions = new List<int>();
-                //foreach (var i in indexes)
-                //{
-                //    if (isUp(stock, nDown, i + nUp, downPercent)) preConditions.Add(i);
-                //}
                 var preConditions = from i in indexes
                                     where isUp(stock, nDown, i + nUp, downPercent)
                                     select i;
@@ -46,7 +41,7 @@ namespace AnalyzePastData
             return (float)post / (float)pre;
         }
 
-        public float UpDownUp(uint startDate, uint endDate, bool limitUp, int nUp, float upPercent, int nDown, float downPercent, int hold, float targetPercent)
+        public float UpDownUp(bool limitUp, int nUp, float upPercent, int nDown, float downPercent, int hold, float targetPercent)
         {
             int pre = 0;
             int post = 0;
@@ -55,11 +50,6 @@ namespace AnalyzePastData
                 List<int> indexes = new List<int>();
                 if (limitUp) indexes = getNDayLimitUp(stock, nUp, false);
                 else indexes = getNDayUp(stock, nUp, upPercent);
-                //List<int> preConditions = new List<int>();
-                //foreach (var i in indexes)
-                //{
-                //    if (isUp(stock, nDown, i + nUp, downPercent)) preConditions.Add(i);
-                //}
                 var preConditions = from i in indexes
                                     where isUp(stock, nDown, i + nUp, downPercent)
                                     select i;
@@ -119,8 +109,6 @@ namespace AnalyzePastData
         public List<int> getNDayLimitUp(Stock stock, int n, bool includeFlat)
         {
             var res = new List<int>();
-            //int start = getIndex(startDate, stock);
-            //int end = getIndex(endDate, stock);
             for (int i = 1; i < stock.DayLines.Count - n + 1; i++)
             {
                 bool isValid = true;
@@ -169,7 +157,6 @@ namespace AnalyzePastData
             uint y = (uint)year;
             uint m = (uint)month;
             uint d = (uint)day;
-            //return (y << 16) + (m << 8) + d;
             return (d << 24) + (m << 16) + y;
         }
 
