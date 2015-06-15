@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,9 +10,40 @@ namespace AnalyzePastData
     class AnalyzeStocks
     {
         List<Stock> stocks;
-        public AnalyzeStocks(List<Stock> stocks)
+        private uint startDate;
+        private uint endDate;
+
+        public AnalyzeStocks(uint startDate, uint endDate)
         {
-            this.stocks = stocks;
+            this.startDate = startDate;
+            this.endDate = endDate;
+            this.stocks = getStocks();
+        }
+
+        public float UpDownOpen(uint startDate, uint endDate, bool limitUp, int nUp, float upPercent, int nDown, float downPercent, int hold, float targetPercent)
+        {
+            int pre = 0;
+            int post = 0;
+            foreach (var stock in stocks)
+            {
+                List<int> indexes = new List<int>();
+                if (limitUp) indexes = getNDayLimitUp(stock, nUp, startDate, endDate, false);
+                else indexes = getNDayUp(stock, nUp, startDate, endDate, upPercent);
+                //List<int> preConditions = new List<int>();
+                //foreach (var i in indexes)
+                //{
+                //    if (isUp(stock, nDown, i + nUp, downPercent)) preConditions.Add(i);
+                //}
+                var preConditions = from i in indexes
+                                    where isUp(stock, nDown, i + nUp, downPercent)
+                                    select i;
+                var valid = from i in preConditions
+                            where buyAtOpen(stock, hold, i + nUp + nDown, targetPercent)
+                            select i;
+                pre += preConditions.Count();
+                post += valid.Count();
+            }
+            return (float)post / (float)pre;
         }
 
         public float UpDownUp(uint startDate, uint endDate, bool limitUp, int nUp, float upPercent, int nDown, float downPercent, int hold, float targetPercent)
@@ -76,6 +108,16 @@ namespace AnalyzePastData
             return (percent > 0 && realPercent > percent) || (percent < 0 && realPercent < percent);
         }
 
+        private bool buyAtOpen(Stock stock, int n, int index, float percent)
+        {
+            if (index == 0 || index > stock.DayLines.Count - n) return false;
+            if (n <= 1) return false;
+            if (Math.Abs(stock.DayLines[index].Open / limitUp(stock.DayLines[index - 1].Close)) < 0.001
+                && stock.DayLines[index].Close == stock.DayLines[index].Low) return false;
+            float realPercent = stock.DayLines[index + n - 1].Close / stock.DayLines[index].Open - 1;
+            return (percent > 0 && realPercent > percent) || (percent < 0 && realPercent < percent);
+        }
+
         public List<int> getNDayLimitUp(Stock stock, int n, uint startDate, uint endDate, bool includeFlat)
         {
             var res = new List<int>();
@@ -125,7 +167,7 @@ namespace AnalyzePastData
 
         }
 
-        public uint DateToUint(int year, int month, int day)
+        public static uint DateToUint(int year, int month, int day)
         {
             uint y = (uint)year;
             uint m = (uint)month;
@@ -134,5 +176,64 @@ namespace AnalyzePastData
             return (d << 24) + (m << 16) + y;
         }
 
+        private List<Stock> getStocks()
+        {
+            List<Stock> list = new List<Stock>();
+            Dictionary<int, string> map = new Dictionary<int, string>();
+            FileStream name = new FileStream(@"G:\StockData\dataToAnlalyze\codeNameTable.txt", FileMode.Open, FileAccess.Read);
+            StreamReader nameReader = new StreamReader(name);
+            try
+            {
+                while (true)
+                {
+                    string str = nameReader.ReadLine();
+                    if (str == null) break;
+                    string[] cn = str.Split(',');
+                    map[int.Parse(cn[0])] = cn[1];
+                }
+            }
+            catch (IOException)
+            { }
+            nameReader.Close();
+            name.Close();
+
+            BufferedStream stocks = new BufferedStream(new FileStream(@"G:\StockData\dataToAnlalyze\history.cxs", FileMode.Open, FileAccess.Read));
+            BinaryReader br = new BinaryReader(stocks);
+            while (true)
+            {
+                try
+                {
+                    int code = br.ReadInt32();
+                    string codeStr = "";
+                    for (int i = 0; i < 6 - (code + "").Length; i++) codeStr = codeStr + "0";
+                    codeStr = codeStr + code;
+                    Stock stock = new Stock(codeStr, map[code]);
+                    while (true)
+                    {
+                        uint date = br.ReadUInt32();
+                        if (date == 0xFFFFFFFF) break;
+                        float open = br.ReadSingle();
+                        float high = br.ReadSingle();
+                        float low = br.ReadSingle();
+                        float close = br.ReadSingle();
+                        uint turnover = br.ReadUInt32();
+                        double volume = br.ReadDouble();
+                        if (turnover == 0) continue;
+                        if (dateLargerThan(date, endDate) || dateLargerThan(startDate, date)) continue;
+                        stock.DayLines.Add(new DayLine(date, open, close, high, low, turnover, volume));
+                    }
+                    list.Add(stock);
+
+                }
+                catch (EndOfStreamException)
+                {
+
+                    break;
+                }
+            }
+            br.Close();
+            stocks.Close();
+            return list;
+        }
     }
 }

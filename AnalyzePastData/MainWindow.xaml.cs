@@ -30,12 +30,10 @@ namespace AnalyzePastData
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            List<Stock> stocks = getStocks();
-            var result = new List<Stock>();
-            AnalyzeStocks analyze = new AnalyzeStocks(stocks);
-            uint startDate = analyze.DateToUint(2008, 7, 1);
-            uint endDate = analyze.DateToUint(2015, 6, 9);
-            float per = analyze.UpDownUp(startDate, endDate, true, 2, (float)0.10, 0, (float)-0.05, 2, (float)-0.02);
+            uint startDate = AnalyzeStocks.DateToUint(2008, 7, 1);
+            uint endDate = AnalyzeStocks.DateToUint(2015, 6, 9);
+            AnalyzeStocks analyze = new AnalyzeStocks(startDate, endDate);
+            float per = analyze.UpDownUp(startDate, endDate, true, 1, (float)0.20, 0, (float)-0.05, 2, (float)0.11);
             //uint startDate = analyze.DateToUint(2011, 1, 1);
             //uint endDate = analyze.DateToUint(2015, 6, 9);
             //Stock s = null;
@@ -48,64 +46,7 @@ namespace AnalyzePastData
             MessageBox.Show(per.ToString());
         }
 
-        private List<Stock> getStocks()
-        {
-            List<Stock> list = new List<Stock>();
-            Dictionary<int, string> map = new Dictionary<int, string>();
-            FileStream name = new FileStream(@"G:\StockData\dataToAnlalyze\codeNameTable.txt", FileMode.Open, FileAccess.Read);
-            StreamReader nameReader = new StreamReader(name);
-            try
-            {
-                while (true)
-                {
-                    string str = nameReader.ReadLine();
-                    if (str == null) break;
-                    string[] cn = str.Split(',');
-                    map[int.Parse(cn[0])] = cn[1];
-                }
-            }
-            catch (IOException)
-            { }
-            nameReader.Close();
-            name.Close();
 
-            BufferedStream stocks = new BufferedStream(new FileStream(@"G:\StockData\dataToAnlalyze\history.cxs", FileMode.Open, FileAccess.Read));
-            BinaryReader br = new BinaryReader(stocks);
-            while (true)
-            {
-                try
-                {
-                    int code = br.ReadInt32();
-                    string codeStr = "";
-                    for (int i = 0; i < 6 - (code + "").Length; i++) codeStr = codeStr + "0";
-                    codeStr = codeStr + code;
-                    Stock stock = new Stock(codeStr, map[code]);
-                    while (true)
-                    {
-                        uint date = br.ReadUInt32();
-                        if (date == 0xFFFFFFFF) break;
-                        float open = br.ReadSingle();
-                        float high = br.ReadSingle();
-                        float low = br.ReadSingle();
-                        float close = br.ReadSingle();
-                        uint turnover = br.ReadUInt32();
-                        double volume = br.ReadDouble();
-                        if (turnover == 0) continue;
-                        stock.DayLines.Add(new DayLine(date, open, close, high, low, turnover, volume));
-                    }
-                    list.Add(stock);
-
-                }
-                catch (EndOfStreamException)
-                {
-
-                    break;
-                }
-            }
-            br.Close();
-            stocks.Close();
-            return list;
-        }
 
         private void WriteStocksToSelfblock(IEnumerable<Stock> stocks)
         {
