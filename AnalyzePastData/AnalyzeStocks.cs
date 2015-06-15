@@ -7,11 +7,18 @@ using System.Threading.Tasks;
 
 namespace AnalyzePastData
 {
+    enum BuyAndSellType
+    {
+        CloseAndClose, OpenAndClose, LowAndClose, CloseAndHigh, OpenAndHigh, LowAndHigh
+    }
+
     class AnalyzeStocks
     {
         List<Stock> stocks;
         private uint startDate;
         private uint endDate;
+
+        private delegate bool BuyAndSell(Stock stock, int n, int index, float percent);
 
         public AnalyzeStocks(uint startDate, uint endDate)
         {
@@ -20,20 +27,25 @@ namespace AnalyzePastData
             this.stocks = getStocks();
         }
 
-        public float UpDownOpen(bool limitUp, int nUp, float upPercent, int nDown, float downPercent, int hold, float targetPercent)
+        public float RateOf(bool limitUp, int nUp, float upPercent, int nDown, float downPercent, int hold, float targetPercent, BuyAndSellType strategy)
         {
             int pre = 0;
             int post = 0;
+            BuyAndSell target = null;
+            switch (strategy)
+            {
+                case BuyAndSellType.CloseAndClose: target += isUp; break;
+                case BuyAndSellType.OpenAndClose: target += openAndClose; break;
+                case BuyAndSellType.LowAndClose: ; break;
+                case BuyAndSellType.CloseAndHigh: break;
+                case BuyAndSellType.OpenAndHigh: break;
+                case BuyAndSellType.LowAndHigh: break;
+            }
             foreach (var stock in stocks)
             {
-                List<int> indexes = new List<int>();
-                if (limitUp) indexes = getNDayLimitUp(stock, nUp, false);
-                else indexes = getNDayUp(stock, nUp, upPercent);
-                var preConditions = from i in indexes
-                                    where isUp(stock, nDown, i + nUp, downPercent)
-                                    select i;
+                var preConditions = upDown(limitUp, nUp, upPercent, nDown, downPercent, stock);
                 var valid = from i in preConditions
-                            where buyAtOpen(stock, hold, i + nUp + nDown, targetPercent)
+                            where target(stock, hold, i + nUp + nDown, targetPercent)
                             select i;
                 pre += preConditions.Count();
                 post += valid.Count();
@@ -41,25 +53,15 @@ namespace AnalyzePastData
             return (float)post / (float)pre;
         }
 
-        public float UpDownUp(bool limitUp, int nUp, float upPercent, int nDown, float downPercent, int hold, float targetPercent)
+        private IEnumerable<int> upDown(bool limitUp, int nUp, float upPercent, int nDown, float downPercent, Stock stock)
         {
-            int pre = 0;
-            int post = 0;
-            foreach (var stock in stocks)
-            {
-                List<int> indexes = new List<int>();
-                if (limitUp) indexes = getNDayLimitUp(stock, nUp, false);
-                else indexes = getNDayUp(stock, nUp, upPercent);
-                var preConditions = from i in indexes
-                                    where isUp(stock, nDown, i + nUp, downPercent)
-                                    select i;
-                var valid = from i in preConditions
-                            where isUp(stock, hold, i + nUp + nDown, targetPercent)
-                            select i;
-                pre += preConditions.Count();
-                post += valid.Count();
-            }
-            return (float)post / (float)pre;
+            List<int> indexes = new List<int>();
+            if (limitUp) indexes = getNDayLimitUp(stock, nUp, false);
+            else indexes = getNDayUp(stock, nUp, upPercent);
+            var preConditions = from i in indexes
+                                where isUp(stock, nDown, i + nUp, downPercent)
+                                select i;
+            return preConditions;
         }
 
         //public bool IsNDayLimitUp(Stock stock, int n, uint startDate, bool includeFlat)
@@ -96,7 +98,7 @@ namespace AnalyzePastData
             return (percent > 0 && realPercent > percent) || (percent < 0 && realPercent < percent);
         }
 
-        private bool buyAtOpen(Stock stock, int n, int index, float percent)
+        private bool openAndClose(Stock stock, int n, int index, float percent)
         {
             if (index == 0 || index > stock.DayLines.Count - n) return false;
             if (n <= 1) return false;
@@ -219,5 +221,6 @@ namespace AnalyzePastData
             stocks.Close();
             return list;
         }
+
     }
 }

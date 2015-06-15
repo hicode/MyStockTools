@@ -33,7 +33,7 @@ namespace AnalyzePastData
             uint startDate = AnalyzeStocks.DateToUint(2008, 7, 1);
             uint endDate = AnalyzeStocks.DateToUint(2015, 6, 9);
             AnalyzeStocks analyze = new AnalyzeStocks(startDate, endDate);
-            float per = analyze.UpDownUp(true, 1, (float)0.20, 0, (float)-0.05, 2, (float)0.11);
+            float per = analyze.RateOf(true, 2, (float)0.20, 0, (float)-0.05, 3, (float)0.0001,BuyAndSellType.CloseAndClose);
             //uint startDate = analyze.DateToUint(2011, 1, 1);
             //uint endDate = analyze.DateToUint(2015, 6, 9);
             //Stock s = null;
