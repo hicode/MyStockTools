@@ -27,8 +27,8 @@ namespace AnalyzePastData
             foreach (var stock in stocks)
             {
                 List<int> indexes = new List<int>();
-                if (limitUp) indexes = getNDayLimitUp(stock, nUp, startDate, endDate, false);
-                else indexes = getNDayUp(stock, nUp, startDate, endDate, upPercent);
+                if (limitUp) indexes = getNDayLimitUp(stock, nUp, false);
+                else indexes = getNDayUp(stock, nUp, upPercent);
                 //List<int> preConditions = new List<int>();
                 //foreach (var i in indexes)
                 //{
@@ -53,8 +53,8 @@ namespace AnalyzePastData
             foreach (var stock in stocks)
             {
                 List<int> indexes = new List<int>();
-                if (limitUp) indexes = getNDayLimitUp(stock, nUp, startDate, endDate, false);
-                else indexes = getNDayUp(stock, nUp, startDate, endDate, upPercent);
+                if (limitUp) indexes = getNDayLimitUp(stock, nUp, false);
+                else indexes = getNDayUp(stock, nUp, upPercent);
                 //List<int> preConditions = new List<int>();
                 //foreach (var i in indexes)
                 //{
@@ -72,27 +72,25 @@ namespace AnalyzePastData
             return (float)post / (float)pre;
         }
 
-        public bool IsNDayLimitUp(Stock stock, int n, uint startDate, bool includeFlat)
-        {
-            int start = getIndex(startDate, stock);
-            if (start <= 0) return false;
-            if (start > stock.DayLines.Count - n) return false;
-            bool isValid = true;
-            for (int j = start; j < start + n && j < stock.DayLines.Count; j++)
-            {
-                if (!includeFlat && (stock.DayLines[j].Low == stock.DayLines[j].Close
-                    || stock.DayLines[j].Close != limitUp(stock.DayLines[j - 1].Close))) isValid = false;
-                if (includeFlat && stock.DayLines[j].Close != limitUp(stock.DayLines[j - 1].Close)) isValid = false;
-            }
-            return isValid;
-        }
+        //public bool IsNDayLimitUp(Stock stock, int n, uint startDate, bool includeFlat)
+        //{
+        //    int start = getIndex(startDate, stock);
+        //    if (start <= 0) return false;
+        //    if (start > stock.DayLines.Count - n) return false;
+        //    bool isValid = true;
+        //    for (int j = start; j < start + n && j < stock.DayLines.Count; j++)
+        //    {
+        //        if (!includeFlat && (stock.DayLines[j].Low == stock.DayLines[j].Close
+        //            || stock.DayLines[j].Close != limitUp(stock.DayLines[j - 1].Close))) isValid = false;
+        //        if (includeFlat && stock.DayLines[j].Close != limitUp(stock.DayLines[j - 1].Close)) isValid = false;
+        //    }
+        //    return isValid;
+        //}
 
-        private List<int> getNDayUp(Stock stock, int n, uint startDate, uint endDate, float percent)
+        private List<int> getNDayUp(Stock stock, int n, float percent)
         {
             var res = new List<int>();
-            int start = getIndex(startDate, stock);
-            int end = getIndex(endDate, stock);
-            for (int i = start; i < end - n + 1; i++)
+            for (int i = 0; i < stock.DayLines.Count - n + 1; i++)
             {
                 if (isUp(stock, n, i, percent)) res.Add(i);
             }
@@ -118,14 +116,13 @@ namespace AnalyzePastData
             return (percent > 0 && realPercent > percent) || (percent < 0 && realPercent < percent);
         }
 
-        public List<int> getNDayLimitUp(Stock stock, int n, uint startDate, uint endDate, bool includeFlat)
+        public List<int> getNDayLimitUp(Stock stock, int n, bool includeFlat)
         {
             var res = new List<int>();
-            int start = getIndex(startDate, stock);
-            int end = getIndex(endDate, stock);
-            for (int i = start; i < end - n + 1; i++)
+            //int start = getIndex(startDate, stock);
+            //int end = getIndex(endDate, stock);
+            for (int i = 1; i < stock.DayLines.Count - n + 1; i++)
             {
-                if (i == 0) continue;
                 bool isValid = true;
                 for (int j = i; j < i + n; j++)
                 {
@@ -138,16 +135,16 @@ namespace AnalyzePastData
             return res;
         }
 
-        public int getIndex(uint date, Stock stock)
-        {
-            if (stock.DayLines.Count != 0 && dateLargerThan(stock.DayLines[0].Date, date)) return 0;
-            for (int i = 0; i < stock.DayLines.Count; i++)
-            {
-                if (stock.DayLines[i].Date == date) return i;
-                if (i > 0 && dateLargerThan(stock.DayLines[i].Date, date) && dateLargerThan(date, stock.DayLines[i - 1].Date)) return i;
-            }
-            return stock.DayLines.Count - 1;
-        }
+        //public int getIndex(uint date, Stock stock)
+        //{
+        //    if (stock.DayLines.Count != 0 && dateLargerThan(stock.DayLines[0].Date, date)) return 0;
+        //    for (int i = 0; i < stock.DayLines.Count; i++)
+        //    {
+        //        if (stock.DayLines[i].Date == date) return i;
+        //        if (i > 0 && dateLargerThan(stock.DayLines[i].Date, date) && dateLargerThan(date, stock.DayLines[i - 1].Date)) return i;
+        //    }
+        //    return stock.DayLines.Count - 1;
+        //}
 
         private float limitUp(float price)
         {
