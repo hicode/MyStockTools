@@ -7,9 +7,14 @@ using System.Threading.Tasks;
 
 namespace AnalyzePastData
 {
-    enum BuyAndSellType
+    enum BuyAndSell
     {
         CloseAndClose, OpenAndClose, LowAndClose, CloseAndHigh, OpenAndHigh, LowAndHigh
+    }
+
+    enum Turnover
+    {
+        Discard, Greater, Equal, Less
     }
 
     class AnalyzeStocks
@@ -18,8 +23,6 @@ namespace AnalyzePastData
         private uint startDate;
         private uint endDate;
 
-        private delegate bool BuyAndSell(Stock stock, int n, int index, float percent);
-
         public AnalyzeStocks(uint startDate, uint endDate)
         {
             this.startDate = startDate;
@@ -27,25 +30,25 @@ namespace AnalyzePastData
             this.stocks = getStocks();
         }
 
-        public float RateOf(bool limitUp, int nUp, float upPercent, int nDown, float downPercent, int hold, float targetPercent, BuyAndSellType strategy)
+        public float RateOf(bool limitUp, int nUp, float upPercent, int nDown, float downPercent, int hold, float targetPercent, BuyAndSell strategy, Turnover op)
         {
             int pre = 0;
             int post = 0;
-            BuyAndSell target = null;
+            Func<Stock, int, int, float, bool> achieve = null;
             switch (strategy)
             {
-                case BuyAndSellType.CloseAndClose: target += isUp; break;
-                case BuyAndSellType.OpenAndClose: target += openAndClose; break;
-                case BuyAndSellType.LowAndClose: ; break;
-                case BuyAndSellType.CloseAndHigh: break;
-                case BuyAndSellType.OpenAndHigh: break;
-                case BuyAndSellType.LowAndHigh: break;
+                case BuyAndSell.CloseAndClose: achieve = isUp; break;
+                case BuyAndSell.OpenAndClose: achieve = openAndClose; break;
+                case BuyAndSell.LowAndClose: achieve = lowAndClose; break;
+                case BuyAndSell.CloseAndHigh: achieve = closeAndHigh; break;
+                case BuyAndSell.OpenAndHigh: achieve = openAndHigh; break;
+                case BuyAndSell.LowAndHigh: achieve = lowAndHigh; break;
             }
             foreach (var stock in stocks)
             {
-                var preConditions = upDown(limitUp, nUp, upPercent, nDown, downPercent, stock);
+                var preConditions = upDown(limitUp, nUp, upPercent, nDown, downPercent, stock, op);
                 var valid = from i in preConditions
-                            where target(stock, hold, i + nUp + nDown, targetPercent)
+                            where achieve(stock, hold, i + nUp + nDown, targetPercent)
                             select i;
                 pre += preConditions.Count();
                 post += valid.Count();
@@ -53,15 +56,41 @@ namespace AnalyzePastData
             return (float)post / (float)pre;
         }
 
-        private IEnumerable<int> upDown(bool limitUp, int nUp, float upPercent, int nDown, float downPercent, Stock stock)
+        private IEnumerable<int> upDown(bool limitUp, int nUp, float upPercent, int nDown, float downPercent, Stock stock, Turnover op)
         {
             List<int> indexes = new List<int>();
             if (limitUp) indexes = getNDayLimitUp(stock, nUp, false);
             else indexes = getNDayUp(stock, nUp, upPercent);
-            var preConditions = from i in indexes
+            var afterTurnover = from i in indexes
+                                where compareTureover(stock, nDown, i + nUp, op)
+                                select i;
+            var preConditions = from i in afterTurnover
                                 where isUp(stock, nDown, i + nUp, downPercent)
                                 select i;
             return preConditions;
+        }
+
+        private bool compareTureover(Stock stock, int n, int index, Turnover op)
+        {
+            if (index == 0 || index > stock.DayLines.Count - n) return false;
+            if (op == Turnover.Discard) return true;
+            for (int i = 0; i < n; i++)
+            {
+                if (op == Turnover.Greater)
+                {
+                    if (stock.DayLines[index + i].Turnover <= stock.DayLines[index - 1].Turnover * 1.15) return false;
+                }
+                else if (op == Turnover.Less)
+                {
+                    if (stock.DayLines[index + i].Turnover >= stock.DayLines[index - 1].Turnover * 0.85) return false;
+                }
+                else if (op == Turnover.Equal)
+                {
+                    if (stock.DayLines[index + i].Turnover > stock.DayLines[index - 1].Turnover * 1.15
+                        || stock.DayLines[index + i].Turnover < stock.DayLines[index - 1].Turnover * 0.85) return false;
+                }
+            }
+            return true;
         }
 
         //public bool IsNDayLimitUp(Stock stock, int n, uint startDate, bool includeFlat)
@@ -90,7 +119,7 @@ namespace AnalyzePastData
         }
 
 
-        public bool isUp(Stock stock, int n, int index, float percent)
+        private bool isUp(Stock stock, int n, int index, float percent)
         {
             if (index == 0 || index > stock.DayLines.Count - n) return false;
             if (n == 0) return true;
@@ -105,6 +134,44 @@ namespace AnalyzePastData
             if (Math.Abs(stock.DayLines[index].Open / limitUp(stock.DayLines[index - 1].Close)) < 0.001
                 && stock.DayLines[index].Close == stock.DayLines[index].Low) return false;
             float realPercent = stock.DayLines[index + n - 1].Close / stock.DayLines[index].Open - 1;
+            return (percent > 0 && realPercent > percent) || (percent < 0 && realPercent < percent);
+        }
+
+        private bool lowAndClose(Stock stock, int n, int index, float percent)
+        {
+            if (index == 0 || index > stock.DayLines.Count - n) return false;
+            if (n <= 1) return false;
+            if (Math.Abs(stock.DayLines[index].Open / limitUp(stock.DayLines[index - 1].Close)) < 0.001
+                && stock.DayLines[index].Close == stock.DayLines[index].Low) return false;
+            float realPercent = stock.DayLines[index + n - 1].Close / stock.DayLines[index].Low - 1;
+            return (percent > 0 && realPercent > percent) || (percent < 0 && realPercent < percent);
+        }
+
+        private bool closeAndHigh(Stock stock, int n, int index, float percent)
+        {
+            if (index == 0 || index > stock.DayLines.Count - n) return false;
+            if (n == 0) return true;
+            float realPercent = stock.DayLines[index + n - 1].High / stock.DayLines[index - 1].Close - 1;
+            return (percent > 0 && realPercent > percent) || (percent < 0 && realPercent < percent);
+        }
+
+        private bool openAndHigh(Stock stock, int n, int index, float percent)
+        {
+            if (index == 0 || index > stock.DayLines.Count - n) return false;
+            if (n <= 1) return false;
+            if (Math.Abs(stock.DayLines[index].Open / limitUp(stock.DayLines[index - 1].Close)) < 0.001
+                && stock.DayLines[index].Close == stock.DayLines[index].Low) return false;
+            float realPercent = stock.DayLines[index + n - 1].High / stock.DayLines[index].Open - 1;
+            return (percent > 0 && realPercent > percent) || (percent < 0 && realPercent < percent);
+        }
+
+        private bool lowAndHigh(Stock stock, int n, int index, float percent)
+        {
+            if (index == 0 || index > stock.DayLines.Count - n) return false;
+            if (n <= 1) return false;
+            if (Math.Abs(stock.DayLines[index].Open / limitUp(stock.DayLines[index - 1].Close)) < 0.001
+                && stock.DayLines[index].Close == stock.DayLines[index].Low) return false;
+            float realPercent = stock.DayLines[index + n - 1].High / stock.DayLines[index].Low - 1;
             return (percent > 0 && realPercent > percent) || (percent < 0 && realPercent < percent);
         }
 

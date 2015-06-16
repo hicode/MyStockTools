@@ -30,10 +30,10 @@ namespace AnalyzePastData
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            uint startDate = AnalyzeStocks.DateToUint(2008, 7, 1);
+            uint startDate = AnalyzeStocks.DateToUint(2014, 7, 1);
             uint endDate = AnalyzeStocks.DateToUint(2015, 6, 9);
             AnalyzeStocks analyze = new AnalyzeStocks(startDate, endDate);
-            float per = analyze.RateOf(true, 2, (float)0.20, 0, (float)-0.05, 3, (float)0.0001,BuyAndSellType.CloseAndClose);
+            float per = analyze.RateOf(true, 2, (float)0.20, 1, (float)-0.05, 3, (float)0.0001, BuyAndSell.LowAndClose, Turnover.Equal);
             //uint startDate = analyze.DateToUint(2011, 1, 1);
             //uint endDate = analyze.DateToUint(2015, 6, 9);
             //Stock s = null;
