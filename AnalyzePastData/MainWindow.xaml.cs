@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Excel;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace AnalyzePastData
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : System.Windows.Window
     {
         public MainWindow()
         {
@@ -30,20 +31,33 @@ namespace AnalyzePastData
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            uint startDate = AnalyzeStocks.DateToUint(2014, 7, 1);
+            //ApplicationClass app = new ApplicationClass();
+            //if (app == null) MessageBox.Show("null");
+            //Workbooks workbooks = app.Workbooks;
+            //Workbook workbook = workbooks.Add(XlWBATemplate.xlWBATWorksheet);
+            //Worksheet worksheet = (Worksheet)workbook.Worksheets[1];
+            ////Range range;
+            //worksheet.Cells[1, 1] = "1";
+            //worksheet.Cells[1, 2] = "2";
+            //worksheet.Cells[1, 3] = "3";
+            //worksheet.Cells[2, 1] = "4";
+            //worksheet.Cells[2, 2] = "5";
+            //worksheet.Cells[2, 3] = "7";
+            //workbook.Saved = true;
+            //workbook.SaveCopyAs(@"G:\StockData\test.xlsx");
+            //workbook.Close(true, Type.Missing, Type.Missing);
+            //workbook = null;
+            //app.Quit();
+            //app = null;
+            //return;
+
+
+            uint startDate = AnalyzeStocks.DateToUint(2007, 10, 1);
             uint endDate = AnalyzeStocks.DateToUint(2015, 6, 9);
             AnalyzeStocks analyze = new AnalyzeStocks(startDate, endDate);
-            float per = analyze.RateOf(true, 2, (float)0.20, 1, (float)-0.05, 3, (float)0.0001, BuyAndSell.LowAndClose, Turnover.Equal);
-            //uint startDate = analyze.DateToUint(2011, 1, 1);
-            //uint endDate = analyze.DateToUint(2015, 6, 9);
-            //Stock s = null;
-            //foreach (var item in stocks)
-            //{
-            //    if (item.Code == "300033") { s = item; break; }
-            //}
-            //var list = analyze.getNDayLimitUp(s, 2, startDate, endDate, true);
+            analyze.StartAnalyze();
 
-            MessageBox.Show(per.ToString());
+            MessageBox.Show("Done");
         }
 
 

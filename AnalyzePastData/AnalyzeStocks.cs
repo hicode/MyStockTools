@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Excel;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace AnalyzePastData
 {
@@ -23,11 +25,52 @@ namespace AnalyzePastData
         private uint startDate;
         private uint endDate;
 
+        string[][] para = new string[9][]
+        {
+            new string[2] { "true", "false" },
+            new string[4] { "1","2", "3", "4" },
+            new string[3] { "0.15", "0.2", "0.25" },
+            new string[4] { "0", "1", "2", "3" },
+            new string[4] { "0.05", "0.10", "0.15", "0.20" },
+            new string[4] { "1", "2", "3", "4" },
+            new string[7] { "0.1", "0.05", "0.02", "0.0001", "-0.02", "-0.05", "-0.1" },
+            new string[6] { "0", "1", "2", "3","4","5"  },
+            new string[4] { "0", "1", "2", "3" }
+        };
+
         public AnalyzeStocks(uint startDate, uint endDate)
         {
             this.startDate = startDate;
             this.endDate = endDate;
             this.stocks = getStocks();
+        }
+
+        public void StartAnalyze()
+        {
+            List<List<string>> list = new List<List<string>>();
+            DFS(0, list, new List<string>());
+            MessageBox.Show(list.Count.ToString());
+        }
+
+        private void DFS(int i, List<List<string>> list, List<string> res)
+        {
+            for (int j = 0; j < para[i].Length; j++)
+            {
+                Console.WriteLine("{0} {1}", i, j);
+                res.Add(para[i][j]);
+                if (i == 8)
+                {
+                    float rate = RateOf(bool.Parse(res[0]), int.Parse(res[1]), float.Parse(res[2]), int.Parse(res[3]),
+                        float.Parse(res[4]), int.Parse(res[5]), float.Parse(res[6]), (BuyAndSell)int.Parse(res[7]), (Turnover)int.Parse(res[8]));
+                    res.Add(rate.ToString());
+                    list.Add(new List<string>(res));
+                    res.RemoveAt(res.Count - 1);
+                    res.RemoveAt(res.Count - 1);
+                    continue;
+                }
+                DFS(i + 1, list, res);
+                res.RemoveAt(res.Count - 1);
+            }
         }
 
         public float RateOf(bool limitUp, int nUp, float upPercent, int nDown, float downPercent, int hold, float targetPercent, BuyAndSell strategy, Turnover op)
@@ -54,6 +97,28 @@ namespace AnalyzePastData
                 post += valid.Count();
             }
             return (float)post / (float)pre;
+        }
+
+        private void WriteToExcelFile()
+        {
+            ApplicationClass app = new ApplicationClass();
+            if (app == null) MessageBox.Show("null");
+            Workbooks workbooks = app.Workbooks;
+            Workbook workbook = workbooks.Add(XlWBATemplate.xlWBATWorksheet);
+            Worksheet worksheet = (Worksheet)workbook.Worksheets[1];
+            //Range range;
+            worksheet.Cells[1, 1] = "1";
+            worksheet.Cells[1, 2] = "2";
+            worksheet.Cells[1, 3] = "3";
+            worksheet.Cells[2, 1] = "4";
+            worksheet.Cells[2, 2] = "5";
+            worksheet.Cells[2, 3] = "6";
+            workbook.Saved = true;
+            workbook.SaveCopyAs(@"G:\StockData\test.xlsx");
+            workbook.Close(true, Type.Missing, Type.Missing);
+            workbook = null;
+            app.Quit();
+            app = null;
         }
 
         private IEnumerable<int> upDown(bool limitUp, int nUp, float upPercent, int nDown, float downPercent, Stock stock, Turnover op)
