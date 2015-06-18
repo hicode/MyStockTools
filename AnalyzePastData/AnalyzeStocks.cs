@@ -24,18 +24,21 @@ namespace AnalyzePastData
         List<Stock> stocks;
         private uint startDate;
         private uint endDate;
+        private List<int>[] first;
+        private List<int>[] second;
+        private List<int>[] third;
 
         string[][] para = new string[9][]
         {
             new string[2] { "true", "false" },
-            new string[4] { "1","2", "3", "4" },
-            new string[3] { "0.15", "0.2", "0.25" },
+            new string[3] { "1","2", "3" },
+            new string[2] { "0.15", "0.2" },
+            new string[3] { "0", "1", "2"},
             new string[4] { "0", "1", "2", "3" },
-            new string[4] { "0.05", "0.10", "0.15", "0.20" },
-            new string[4] { "1", "2", "3", "4" },
-            new string[7] { "0.1", "0.05", "0.02", "0.0001", "-0.02", "-0.05", "-0.1" },
-            new string[6] { "0", "1", "2", "3","4","5"  },
-            new string[4] { "0", "1", "2", "3" }
+            new string[3] { "0.10", "0.15", "0.20" },
+            new string[2] { "2", "3" },
+            new string[4] { "0.1", "0.05", "0.0001", "-0.02" },
+            new string[4] { "0", "1", "3", "4" }
         };
 
         public AnalyzeStocks(uint startDate, uint endDate)
@@ -54,15 +57,48 @@ namespace AnalyzePastData
 
         private void DFS(int i, List<List<string>> list, List<string> res)
         {
+            if (i == 2 && res[0] == "true")
+            {
+                res.Add("0");
+                DFS(i + 1, list, res);
+                res.RemoveAt(res.Count - 1);
+                return;
+            }
+            if (i == 3)
+            {
+                getUp(bool.Parse(res[0]), int.Parse(res[1]), float.Parse(res[2]));
+            }
+            if (i == 4 && res[3] == "0")
+            {
+                res.Add("0");
+                res.Add("0");
+                second = first;
+                DFS(i + 2, list, res);
+                res.RemoveAt(res.Count - 1);
+                res.RemoveAt(res.Count - 1);
+                return;
+            }
+            if (i == 5)
+            {
+                if (res[4] != "0") getTOCompare(int.Parse(res[1]), int.Parse(res[3]), (Turnover)int.Parse(res[4]));
+                else second = first;
+            }
+            if (i == 6)
+            {
+                getDown(int.Parse(res[1]), int.Parse(res[3]), float.Parse(res[5]));
+            }
             for (int j = 0; j < para[i].Length; j++)
             {
-                Console.WriteLine("{0} {1}", i, j);
                 res.Add(para[i][j]);
                 if (i == 8)
                 {
-                    float rate = RateOf(bool.Parse(res[0]), int.Parse(res[1]), float.Parse(res[2]), int.Parse(res[3]),
-                        float.Parse(res[4]), int.Parse(res[5]), float.Parse(res[6]), (BuyAndSell)int.Parse(res[7]), (Turnover)int.Parse(res[8]));
+                    float rate = finaleRate(int.Parse(res[1]), int.Parse(res[3]), int.Parse(res[6]), float.Parse(res[7]), (BuyAndSell)int.Parse(res[8]));
                     res.Add(rate.ToString());
+                    for (int k = 0; k < res.Count; k++)
+                    {
+                        Console.Write(res[k]+" ");
+                    }
+                    Console.WriteLine();
                     list.Add(new List<string>(res));
                     res.RemoveAt(res.Count - 1);
                     res.RemoveAt(res.Count - 1);
@@ -71,6 +107,77 @@ namespace AnalyzePastData
                 DFS(i + 1, list, res);
                 res.RemoveAt(res.Count - 1);
             }
+        }
+
+        private void getUp(bool limitUp, int n, float upPercent)
+        {
+            first = new List<int>[stocks.Count];
+            for (int i = 0; i < stocks.Count; i++)
+            {
+                var list = new List<int>();
+                if (limitUp) list = getNDayLimitUp(stocks[i], n, false);
+                else list = getNDayUp(stocks[i], n, upPercent);
+                first[i] = list;
+            }
+        }
+
+        private void getTOCompare(int nUp, int nDown, Turnover op)
+        {
+            second = new List<int>[stocks.Count];
+            for (int i = 0; i < first.Length; i++)
+            {
+                //var newList = from j in before[i]
+                //              where compareTureover(stocks[i], nDown, j + nUp, op)
+                //              select j;
+                List<int> newList = new List<int>();
+                foreach (var j in first[i])
+                {
+                    if (compareTureover(stocks[i], nDown, j + nUp, op)) newList.Add(j);
+                }
+                second[i] = newList;
+            }
+        }
+
+        private void getDown(int nUp, int nDown, float downPercent)
+        {
+            third = new List<int>[stocks.Count];
+            for (int i = 0; i < second.Length; i++)
+            {
+                //var newList = from j in before[i]
+                //              where isUp(stocks[i], nDown, j + nUp, downPercent)
+                //              select j;
+                List<int> newList = new List<int>();
+                foreach (var j in second[i])
+                {
+                    if (isUp(stocks[i], nDown, j + nUp, downPercent)) newList.Add(j);
+                }
+                third[i] = newList;
+            }
+        }
+
+        private float finaleRate(int nUp, int nDown, int nHold, float targetPercent, BuyAndSell strategy)
+        {
+            int pre = 0;
+            int post = 0;
+            Func<Stock, int, int, float, bool> achieve = null;
+            switch (strategy)
+            {
+                case BuyAndSell.CloseAndClose: achieve = isUp; break;
+                case BuyAndSell.OpenAndClose: achieve = openAndClose; break;
+                case BuyAndSell.LowAndClose: achieve = lowAndClose; break;
+                case BuyAndSell.CloseAndHigh: achieve = closeAndHigh; break;
+                case BuyAndSell.OpenAndHigh: achieve = openAndHigh; break;
+                case BuyAndSell.LowAndHigh: achieve = lowAndHigh; break;
+            }
+            for (int i = 0; i < third.Length; i++)
+            {
+                pre += third[i].Count();
+                var valid = from j in third[i]
+                            where achieve(stocks[i], nHold, j + nUp + nDown, targetPercent)
+                            select j;
+                post += valid.Count();
+            }
+            return (float)post / (float)pre;
         }
 
         public float RateOf(bool limitUp, int nUp, float upPercent, int nDown, float downPercent, int hold, float targetPercent, BuyAndSell strategy, Turnover op)
