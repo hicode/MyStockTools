@@ -57,7 +57,7 @@ namespace AnalyzePastData
             AnalyzeStocks analyze = new AnalyzeStocks(startDate, endDate);
             analyze.StartAnalyze();
 
-            MessageBox.Show("Done");
+            //MessageBox.Show(((BuyAndSell)0).ToString());
         }
 
 

@@ -35,7 +35,7 @@ namespace AnalyzePastData
             new string[2] { "0.15", "0.2" },
             new string[3] { "0", "1", "2"},
             new string[4] { "0", "1", "2", "3" },
-            new string[3] { "0.10", "0.15", "0.20" },
+            new string[2] { "0.05", "0.10"},
             new string[2] { "2", "3" },
             new string[4] { "0.1", "0.05", "0.0001", "-0.02" },
             new string[4] { "0", "1", "3", "4" }
@@ -52,6 +52,7 @@ namespace AnalyzePastData
         {
             List<List<string>> list = new List<List<string>>();
             DFS(0, list, new List<string>());
+            WriteToExcelFile(list);
             MessageBox.Show(list.Count.ToString());
         }
 
@@ -96,7 +97,7 @@ namespace AnalyzePastData
                     res.Add(rate.ToString());
                     for (int k = 0; k < res.Count; k++)
                     {
-                        Console.Write(res[k]+" ");
+                        Console.Write(res[k] + " ");
                     }
                     Console.WriteLine();
                     list.Add(new List<string>(res));
@@ -149,7 +150,7 @@ namespace AnalyzePastData
                 List<int> newList = new List<int>();
                 foreach (var j in second[i])
                 {
-                    if (isUp(stocks[i], nDown, j + nUp, downPercent)) newList.Add(j);
+                    if (isUp(stocks[i], nDown, j + nUp, -downPercent)) newList.Add(j);
                 }
                 third[i] = newList;
             }
@@ -206,7 +207,7 @@ namespace AnalyzePastData
             return (float)post / (float)pre;
         }
 
-        private void WriteToExcelFile()
+        private void WriteToExcelFile(List<List<string>> list)
         {
             ApplicationClass app = new ApplicationClass();
             if (app == null) MessageBox.Show("null");
@@ -214,14 +215,46 @@ namespace AnalyzePastData
             Workbook workbook = workbooks.Add(XlWBATemplate.xlWBATWorksheet);
             Worksheet worksheet = (Worksheet)workbook.Worksheets[1];
             //Range range;
-            worksheet.Cells[1, 1] = "1";
-            worksheet.Cells[1, 2] = "2";
-            worksheet.Cells[1, 3] = "3";
-            worksheet.Cells[2, 1] = "4";
-            worksheet.Cells[2, 2] = "5";
-            worksheet.Cells[2, 3] = "6";
+            //worksheet.Cells[1, 1] = "1";
+            //worksheet.Cells[1, 2] = "2";
+            //worksheet.Cells[1, 3] = "3";
+            //worksheet.Cells[2, 1] = "4";
+            //worksheet.Cells[2, 2] = "5";
+            //worksheet.Cells[2, 3] = "6";
+            worksheet.Cells[1, 1] = "涨停";
+            worksheet.Cells[1, 2] = "连涨(天)";
+            worksheet.Cells[1, 3] = "涨幅";
+            worksheet.Cells[1, 4] = "连跌(天)";
+            worksheet.Cells[1, 5] = "换手";
+            worksheet.Cells[1, 6] = "跌幅";
+            worksheet.Cells[1, 7] = "持有(天)";
+            worksheet.Cells[1, 8] = "预期收益";
+            worksheet.Cells[1, 9] = "买卖";
+            worksheet.Cells[1, 10] = "成功率";
+            var sorted = list.OrderByDescending(item => float.Parse(item[7]))
+                             .ThenByDescending(item => float.Parse(item[9]));
+            int i = 0;
+            foreach (var item in sorted)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    if (j == 4) worksheet.Cells[i + 2, j + 1] = ((Turnover)int.Parse(item[j])).ToString();
+                    else if (j == 8) worksheet.Cells[i + 2, j + 1] = ((BuyAndSell)int.Parse(item[j])).ToString();
+                    else worksheet.Cells[i + 2, j + 1] = item[j];
+                }
+                i++;
+            }
+            //for (int i = 0; i < list.Count; i++)
+            //{
+            //    for (int j = 0; j < 10; j++)
+            //    {
+            //        if (j == 4) worksheet.Cells[i + 2, j + 1] = ((Turnover)int.Parse(list[i][j])).ToString();
+            //        else if (j == 8) worksheet.Cells[i + 2, j + 1] = ((BuyAndSell)int.Parse(list[i][j])).ToString();
+            //        else worksheet.Cells[i + 2, j + 1] = list[i][j];
+            //    }
+            //}
             workbook.Saved = true;
-            workbook.SaveCopyAs(@"G:\StockData\test.xlsx");
+            workbook.SaveCopyAs(@"G:\StockData\StocksAnalyzeResult.xlsx");
             workbook.Close(true, Type.Missing, Type.Missing);
             workbook = null;
             app.Quit();
