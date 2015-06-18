@@ -65,6 +65,7 @@ namespace AnalyzePastData
                 res.RemoveAt(res.Count - 1);
                 return;
             }
+            if (i == 2 && res[0]=="false" && res[1] != "3") return;
             if (i == 3)
             {
                 getUp(bool.Parse(res[0]), int.Parse(res[1]), float.Parse(res[2]));
@@ -86,6 +87,7 @@ namespace AnalyzePastData
             }
             if (i == 6)
             {
+                if (res[3] == "1" && res[5] == "0.10") return;
                 getDown(int.Parse(res[1]), int.Parse(res[3]), float.Parse(res[5]));
             }
             for (int j = 0; j < para[i].Length; j++)
@@ -93,7 +95,16 @@ namespace AnalyzePastData
                 res.Add(para[i][j]);
                 if (i == 8)
                 {
-                    float rate = finaleRate(int.Parse(res[1]), int.Parse(res[3]), int.Parse(res[6]), float.Parse(res[7]), (BuyAndSell)int.Parse(res[8]));
+                    int pre, post;
+                    float rate = finaleRate(int.Parse(res[1]), 
+                        int.Parse(res[3]), int.Parse(res[6]), float.Parse(res[7]), (BuyAndSell)int.Parse(res[8]),out pre,out post);
+                    if (pre < 100)
+                    {
+                        res.RemoveAt(res.Count - 1);
+                        continue;
+                    }
+                    res.Add(pre.ToString());
+                    res.Add(post.ToString());
                     res.Add(rate.ToString());
                     for (int k = 0; k < res.Count; k++)
                     {
@@ -101,6 +112,8 @@ namespace AnalyzePastData
                     }
                     Console.WriteLine();
                     list.Add(new List<string>(res));
+                    res.RemoveAt(res.Count - 1);
+                    res.RemoveAt(res.Count - 1);
                     res.RemoveAt(res.Count - 1);
                     res.RemoveAt(res.Count - 1);
                     continue;
@@ -156,10 +169,10 @@ namespace AnalyzePastData
             }
         }
 
-        private float finaleRate(int nUp, int nDown, int nHold, float targetPercent, BuyAndSell strategy)
+        private float finaleRate(int nUp, int nDown, int nHold, float targetPercent, BuyAndSell strategy,out int pre,out int post)
         {
-            int pre = 0;
-            int post = 0;
+            pre = 0;
+            post = 0;
             Func<Stock, int, int, float, bool> achieve = null;
             switch (strategy)
             {
@@ -230,13 +243,15 @@ namespace AnalyzePastData
             worksheet.Cells[1, 7] = "持有(天)";
             worksheet.Cells[1, 8] = "预期收益";
             worksheet.Cells[1, 9] = "买卖";
-            worksheet.Cells[1, 10] = "成功率";
+            worksheet.Cells[1, 10] = "符合条件";
+            worksheet.Cells[1, 11] = "达到预期";
+            worksheet.Cells[1, 12] = "成功率";
             var sorted = list.OrderByDescending(item => float.Parse(item[7]))
-                             .ThenByDescending(item => float.Parse(item[9]));
+                             .ThenByDescending(item => float.Parse(item[11]));
             int i = 0;
             foreach (var item in sorted)
             {
-                for (int j = 0; j < 10; j++)
+                for (int j = 0; j < 12; j++)
                 {
                     if (j == 4) worksheet.Cells[i + 2, j + 1] = ((Turnover)int.Parse(item[j])).ToString();
                     else if (j == 8) worksheet.Cells[i + 2, j + 1] = ((BuyAndSell)int.Parse(item[j])).ToString();
