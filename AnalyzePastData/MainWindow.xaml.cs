@@ -31,33 +31,12 @@ namespace AnalyzePastData
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //ApplicationClass app = new ApplicationClass();
-            //if (app == null) MessageBox.Show("null");
-            //Workbooks workbooks = app.Workbooks;
-            //Workbook workbook = workbooks.Add(XlWBATemplate.xlWBATWorksheet);
-            //Worksheet worksheet = (Worksheet)workbook.Worksheets[1];
-            ////Range range;
-            //worksheet.Cells[1, 1] = "1";
-            //worksheet.Cells[1, 2] = "2";
-            //worksheet.Cells[1, 3] = "3";
-            //worksheet.Cells[2, 1] = "4";
-            //worksheet.Cells[2, 2] = "5";
-            //worksheet.Cells[2, 3] = "7";
-            //workbook.Saved = true;
-            //workbook.SaveCopyAs(@"G:\StockData\test.xlsx");
-            //workbook.Close(true, Type.Missing, Type.Missing);
-            //workbook = null;
-            //app.Quit();
-            //app = null;
-            //return;
-
-
-            uint startDate = AnalyzeStocks.DateToUint(2007, 10, 1);
-            uint endDate = AnalyzeStocks.DateToUint(2015, 6, 9);
-            AnalyzeStocks analyze = new AnalyzeStocks(startDate, endDate);
-            analyze.StartAnalyze();
-
-            //MessageBox.Show(((BuyAndSell)0).ToString());
+            //uint startDate = AnalyzeStocks.DateToUint(2007, 10, 1);
+            //uint endDate = AnalyzeStocks.DateToUint(2015, 6, 9);
+            //AnalyzeStocks analyze = new AnalyzeStocks(startDate, endDate);
+            //analyze.StartAnalyze();
+            var kLineGraph = new DayLineGraph();
+            kLineGraph.Show();
         }
 
 

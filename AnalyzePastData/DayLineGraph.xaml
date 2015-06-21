@@ -1,0 +1,11 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:AnalyzePastData" x:Class="AnalyzePastData.DayLineGraph"
+        Title="DayLineGraph" WindowStartupLocation="CenterScreen" Background="Black">
+    <Grid>
+        <Canvas x:Name="canvas" Loaded="canvas_Loaded">
+            <Rectangle x:Name="Kline" Stroke="Red" Width="{Binding ActualWidth, ElementName=sp, Mode=OneWay}" Height="{Binding ActualHeight, ElementName=sp, Mode=OneWay}" Margin="0,0,10,10" />
+        </Canvas>
+    </Grid>
+</Window>
