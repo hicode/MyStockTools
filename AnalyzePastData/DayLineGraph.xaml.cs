@@ -20,58 +20,60 @@ namespace AnalyzePastData
     public partial class DayLineGraph : Window
     {
         private List<Stock> stocks;
-        //private List<UnitRects> units;
-        private int num = 50;
+        private int num = 150;
         private float highest, lowest;
         private double width;
+        private Stock stock;
 
         public DayLineGraph()
         {
             InitializeComponent();
-            //Rectangle rect = new Rectangle();
-            //rect.Stroke = Brushes.Red;
-            //rect.Height = 300;
-            //rect.Width = 300;
-            //canvas.Children.Add(rect);
 
             uint startDate = Utilities.DateToUint(2007, 10, 1);
             uint endDate = Utilities.DateToUint(2015, 6, 9);
             stocks = Utilities.getStocks(startDate, endDate);
-
-            //xxx.Rect.Stroke = Brushes.Red;
-            //xxx.Rect.Fill = Brushes.Black;
-            //xxx.Rect.Width = 20;
-            //xxx.Rect.Height = 60;
-            //Canvas.SetTop(xxx, 100);
-            //Canvas.SetLeft(xxx, 100);
-            //xxx.Line.Stroke = Brushes.Red;
-            //xxx.Line.Width = 1;
-            //xxx.Line.Height = 90;
-            //xxx.Rect.Margin = new Thickness(0, 10, 0, 0);
-            //xxx.Line.Margin = new Thickness(10, 0, 0, 0);
+            stock = stocks[1500];
+            AddGraph();
         }
 
-        private void AddUnits(Stock stock)
+        private void AddGraph()
         {
-            setBound(stock);
+            for (int i = 0; i < stock.DayLines.Count; i++)
+            {
+                canvas.Children.Add(new Rectangle());
+                canvas.Children.Add(new Rectangle());
+                Panel.SetZIndex(canvas.Children[canvas.Children.Count - 1], 0);
+                Panel.SetZIndex(canvas.Children[canvas.Children.Count - 2], 1);
+
+            }
+        }
+
+        private void SetUnits()
+        {
+            SetBound();
             for (int i = stock.DayLines.Count - 1; i >= 0; i--)
             {
-                Rectangle rect1 = new Rectangle();
-                //units.Add(unit);
-                canvas.Children.Add(rect1);
+                Rectangle rect1 = canvas.Children[i * 2 + 1] as Rectangle;
                 double height = stock.DayLines[i].Open - stock.DayLines[i].Close;
                 Brush brush = height <= 0 ? Brushes.Red : Brushes.LightBlue;
                 rect1.Stroke = brush;
                 if (height > 0) rect1.Fill = brush;
-                rect1.Width = width * 9 / 10;
+                else rect1.Fill = Brushes.Black;
+                rect1.Width = width * 4 / 5;
                 double x = (highest - lowest) / canvas.ActualHeight;
                 rect1.Height = Math.Abs(height) / x;
                 Canvas.SetTop(rect1, (highest - Math.Max(stock.DayLines[i].Open, stock.DayLines[i].Close)) / x);
-                Canvas.SetLeft(rect1, width * (stock.DayLines.Count - 1 - i));
+                Canvas.SetLeft(rect1, width * (i - (stock.DayLines.Count - 1 - num) - 1));
+                Rectangle rect2 = canvas.Children[i * 2] as Rectangle;
+                rect2.Height = (stock.DayLines[i].High - stock.DayLines[i].Low) / x;
+                rect2.Width = 1;
+                rect2.Stroke = brush;
+                Canvas.SetTop(rect2, (highest - stock.DayLines[i].High) / x);
+                Canvas.SetLeft(rect2, width * (i - (stock.DayLines.Count - 1 - num) - 1) + width * 2 / 5);
             }
         }
 
-        private void setBound(Stock stock)
+        private void SetBound()
         {
             highest = 0;
             lowest = float.MaxValue;
@@ -85,8 +87,27 @@ namespace AnalyzePastData
 
         private void canvas_Loaded(object sender, RoutedEventArgs e)
         {
-            AddUnits(stocks[0]);
+            SetUnits();
 
+        }
+
+        private void canvas_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Up: num /= 2;
+                    break;
+                case Key.Down: num *= 2;
+                    break;
+                default: return;
+            }
+            SetUnits();
+        }
+
+
+        private void canvas_Resize(object sender, SizeChangedEventArgs e)
+        {
+            SetUnits();
         }
     }
 }
