@@ -2,26 +2,30 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:AnalyzePastData" x:Class="AnalyzePastData.DayLineGraph"
-        Title="DayLineGraph" WindowStartupLocation="CenterScreen" Background="Black" KeyDown="canvas_KeyDown" MouseDown="Window_MouseDown">
+        Title="DayLineGraph" WindowStartupLocation="CenterScreen" Background="Black">
     <Window.Resources>
         <local:DataToShow x:Key="rightPanel"/>
         <local:DataToShow x:Key="mousePanel"/>
     </Window.Resources>
-    <Grid ShowGridLines="True">
+    <Grid ShowGridLines="True"  >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="150"/>
             <ColumnDefinition/>
             <ColumnDefinition Width="50"/>
-            <ColumnDefinition Width="70"/>
+            <ColumnDefinition Width="75"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="200"/>
         </Grid.RowDefinitions>
-        <Canvas x:Name="canvas" Loaded="canvas_Loaded" KeyDown="canvas_KeyDown" SizeChanged="canvas_Resize" Grid.Column="1" Grid.Row="0" ClipToBounds="True">
+        <ListBox x:Name="stockList" Grid.Column="0" Grid.RowSpan="2" Background="Black" Foreground="White" SelectionMode="Single" SelectedIndex="0" SelectionChanged="stockList_SelectionChanged">
+            
+        </ListBox>
+        <Canvas x:Name="canvas" Loaded="canvas_Loaded" Background="Black" KeyDown="canvas_KeyDown" SizeChanged="canvas_Resize" Grid.Column="1" Grid.Row="0" ClipToBounds="True" Focusable="True" IsEnabled="True" MouseDown="canvas_MouseDown">
         </Canvas>
+        <Canvas Grid.Column="1" Grid.Row="1" Focusable="True" IsEnabled="True" KeyDown="canvas_KeyDown" MouseDown="canvas_MouseDown"/>
         <StackPanel Grid.Column="2" Grid.RowSpan="2" DataContext="{DynamicResource rightPanel}">
-            <TextBlock TextWrapping="Wrap" Text="{Binding Code}" Foreground="Cyan" Height="20" Margin="3"/>
+            <TextBlock TextWrapping="Wrap" Text="{Binding Code}" Foreground="Cyan" Height="20" Margin="3,3,0,0"/>
             <TextBlock TextWrapping="Wrap" Text="开盘" Foreground="White" Margin="5,0,0,0"/>
             <TextBlock TextWrapping="Wrap" Text="收盘" Foreground="White" Margin="5,0,0,0"/>
             <TextBlock TextWrapping="Wrap" Text="最高" Foreground="White" Margin="5,0,0,0"/>
@@ -30,13 +34,13 @@
             <TextBlock TextWrapping="Wrap" Text="成交额" Foreground="White" Margin="5,0,0,0"/>
         </StackPanel>
         <StackPanel Grid.Column="3" Grid.RowSpan="2" DataContext="{DynamicResource rightPanel}">
-            <TextBlock TextWrapping="Wrap" Text="{Binding Name}" Foreground="Yellow" Height="20" Margin="3"/>
-            <TextBlock TextWrapping="Wrap" Text="{Binding Open}" Foreground="{Binding OpenColor}"/>
-            <TextBlock TextWrapping="Wrap" Text="{Binding Close}" Foreground="{Binding CloseColor}"/>
-            <TextBlock TextWrapping="Wrap" Text="{Binding High}" Foreground="{Binding HighColor}"/>
-            <TextBlock TextWrapping="Wrap" Text="{Binding Low}" Foreground="{Binding LowColor}"/>
-            <TextBlock TextWrapping="Wrap" Text="{Binding Turnover}" Foreground="Cyan"/>
-            <TextBlock TextWrapping="Wrap" Text="{Binding Volume}" Foreground="Cyan"/>
+            <TextBlock TextWrapping="Wrap" Text="{Binding Name}" Foreground="Yellow" Height="20" Margin="3,3,0,0"/>
+            <TextBlock TextWrapping="Wrap" Text="{Binding Open}" Foreground="{Binding OpenColor}" Margin="3,0,0,0"/>
+            <TextBlock TextWrapping="Wrap" Text="{Binding Close}" Foreground="{Binding CloseColor}" Margin="3,0,0,0"/>
+            <TextBlock TextWrapping="Wrap" Text="{Binding High}" Foreground="{Binding HighColor}" Margin="3,0,0,0"/>
+            <TextBlock TextWrapping="Wrap" Text="{Binding Low}" Foreground="{Binding LowColor}" Margin="3,0,0,0"/>
+            <TextBlock TextWrapping="Wrap" Text="{Binding Turnover}" Foreground="Cyan" Margin="3,0,0,0"/>
+            <TextBlock TextWrapping="Wrap" Text="{Binding Volume}" Foreground="Cyan" Margin="3,0,0,0"/>
 
         </StackPanel>
     </Grid>

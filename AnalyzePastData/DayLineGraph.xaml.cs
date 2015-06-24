@@ -24,21 +24,37 @@ namespace AnalyzePastData
         private float highest, lowest;
         private double width;
         private Stock stock;
+        private int max;
 
         public DayLineGraph()
         {
-            InitializeComponent();
-
             uint startDate = Utilities.DateToUint(2007, 10, 1);
             uint endDate = Utilities.DateToUint(2015, 6, 9);
             stocks = Utilities.getStocks(startDate, endDate);
-            stock = stocks[2000];
+            for (int i = 0; i < stocks.Count; i++)
+            {
+                max = Math.Max(max, stocks[i].DayLines.Count);
+            }
+            InitializeComponent();
+
+            AddList();
+            stock = stocks[stockList.SelectedIndex];
             AddGraph();
+            canvas.Focus();
+            Keyboard.Focus(canvas);
+        }
+
+        private void AddList()
+        {
+            for (int i = 0; i < stocks.Count; i++)
+            {
+                stockList.Items.Add(stocks[i].Code + " " + stocks[i].Name);
+            }
         }
 
         private void AddGraph()
         {
-            for (int i = 0; i < stock.DayLines.Count; i++)
+            for (int i = 0; i < max; i++)
             {
                 canvas.Children.Add(new Rectangle());
                 canvas.Children.Add(new Rectangle());
@@ -61,7 +77,7 @@ namespace AnalyzePastData
                 else rect1.Fill = Brushes.Black;
                 rect1.Width = width * 4 / 5;
                 double x = (highest - lowest) / canvas.ActualHeight;
-                rect1.Height = Math.Abs(height) / x;
+                rect1.Height = Math.Abs(height) / x + 1;
                 Canvas.SetTop(rect1, (highest - Math.Max(stock.DayLines[i].Open, stock.DayLines[i].Close)) / x);
                 Canvas.SetLeft(rect1, width * (i - (stock.DayLines.Count - 1 - num) - 1));
                 Rectangle rect2 = canvas.Children[i * 2] as Rectangle;
@@ -70,6 +86,13 @@ namespace AnalyzePastData
                 rect2.Stroke = brush;
                 Canvas.SetTop(rect2, (highest - stock.DayLines[i].High) / x);
                 Canvas.SetLeft(rect2, width * (i - (stock.DayLines.Count - 1 - num) - 1) + width * 2 / 5);
+            }
+            for (int i = stock.DayLines.Count; i < max; i++)
+            {
+                Rectangle rect1 = canvas.Children[i * 2 + 1] as Rectangle;
+                rect1.Height = 0;
+                Rectangle rect2 = canvas.Children[i * 2] as Rectangle;
+                rect2.Height = 0;
             }
         }
 
@@ -97,21 +120,21 @@ namespace AnalyzePastData
             data.Code = stock.Code;
             data.Name = stock.Name;
             int count = stock.DayLines.Count;
-            data.Open = stock.DayLines[count - 1].Open;
-            data.Close = stock.DayLines[count - 1].Close;
-            data.High = stock.DayLines[count - 1].High;
-            data.Low = stock.DayLines[count - 1].Low;
-            data.Turnover = stock.DayLines[count - 1].Turnover;
-            data.Volume = stock.DayLines[count - 1].Volume;
-            data.OpenColor = SetColor(count - 1, stock.DayLines[count - 1].Open);
-            data.CloseColor = SetColor(count - 1, stock.DayLines[count - 1].Close);
-            data.HighColor = SetColor(count - 1, stock.DayLines[count - 1].High);
-            data.LowColor = SetColor(count - 1, stock.DayLines[count - 1].Low);
+            data.Open = count == 0 ? 0 : stock.DayLines[count - 1].Open;
+            data.Close = count == 0 ? 0 : stock.DayLines[count - 1].Close;
+            data.High = count == 0 ? 0 : stock.DayLines[count - 1].High;
+            data.Low = count == 0 ? 0 : stock.DayLines[count - 1].Low;
+            data.Turnover = count == 0 ? 0 : stock.DayLines[count - 1].Turnover;
+            data.Volume = count == 0 ? 0 : stock.DayLines[count - 1].Volume;
+            data.OpenColor = count < 2 ? Brushes.Cyan : SetColor(count - 1, stock.DayLines[count - 1].Open);
+            data.CloseColor = count < 2 ? Brushes.Cyan : SetColor(count - 1, stock.DayLines[count - 1].Close);
+            data.HighColor = count < 2 ? Brushes.Cyan : SetColor(count - 1, stock.DayLines[count - 1].High);
+            data.LowColor = count < 2 ? Brushes.Cyan : SetColor(count - 1, stock.DayLines[count - 1].Low);
         }
 
-        private Brush SetColor(int i,float value)
+        private Brush SetColor(int i, float value)
         {
-            return value >= stock.DayLines[i - 1].Close ? Brushes.Red : Brushes.LightGreen;
+            return value >= stock.DayLines[i - 1].Close ? Brushes.Red : Brushes.Green;
         }
 
         private void canvas_KeyDown(object sender, KeyEventArgs e)
@@ -125,6 +148,7 @@ namespace AnalyzePastData
                 default: return;
             }
             SetUnits();
+            e.Handled = true;
         }
 
 
@@ -133,9 +157,22 @@ namespace AnalyzePastData
             SetUnits();
         }
 
-        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
-        {
 
+        private void stockList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (canvas.Children.Count < max) return;
+
+            stock = stocks[stockList.SelectedIndex];
+            SetUnits();
+            ChangeStock();
         }
+
+        private void canvas_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            canvas.Focus();
+            Keyboard.Focus(canvas);
+        }
+
+        
     }
 }
