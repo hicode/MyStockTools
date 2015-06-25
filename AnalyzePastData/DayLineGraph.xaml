@@ -7,7 +7,7 @@
         <local:DataToShow x:Key="rightPanel"/>
         <local:DataToShow x:Key="mousePanel"/>
     </Window.Resources>
-    <Grid ShowGridLines="True"  >
+    <Grid >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="150"/>
             <ColumnDefinition/>
@@ -18,12 +18,15 @@
             <RowDefinition/>
             <RowDefinition Height="200"/>
         </Grid.RowDefinitions>
-        <ListBox x:Name="stockList" Grid.Column="0" Grid.RowSpan="2" Background="Black" Foreground="White" SelectionMode="Single" SelectedIndex="0" SelectionChanged="stockList_SelectionChanged">
+        <Border Grid.Column="1" Grid.RowSpan="2" BorderBrush="Red" BorderThickness="1" Panel.ZIndex="1"/>
+        <Border Grid.Column="1" Grid.Row="1" BorderBrush="Red" BorderThickness="1" Panel.ZIndex="1"/>
+
+        <ListBox x:Name="stockList" Grid.Column="0" Grid.RowSpan="2" Background="Black" Foreground="Yellow" SelectionMode="Single" SelectedIndex="0" SelectionChanged="stockList_SelectionChanged">
             
         </ListBox>
         <Canvas x:Name="canvas" Loaded="canvas_Loaded" Background="Black" KeyDown="canvas_KeyDown" SizeChanged="canvas_Resize" Grid.Column="1" Grid.Row="0" ClipToBounds="True" Focusable="True" IsEnabled="True" MouseDown="canvas_MouseDown">
         </Canvas>
-        <Canvas Grid.Column="1" Grid.Row="1" Focusable="True" IsEnabled="True" KeyDown="canvas_KeyDown" MouseDown="canvas_MouseDown"/>
+        <Canvas x:Name="canvasT" Grid.Column="1" Grid.Row="1" Focusable="True" IsEnabled="True" Background="Black" KeyDown="canvas_KeyDown" MouseDown="canvas_MouseDown"/>
         <StackPanel Grid.Column="2" Grid.RowSpan="2" DataContext="{DynamicResource rightPanel}">
             <TextBlock TextWrapping="Wrap" Text="{Binding Code}" Foreground="Cyan" Height="20" Margin="3,3,0,0"/>
             <TextBlock TextWrapping="Wrap" Text="开盘" Foreground="White" Margin="5,0,0,0"/>

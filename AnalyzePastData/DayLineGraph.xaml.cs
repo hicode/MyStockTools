@@ -22,6 +22,7 @@ namespace AnalyzePastData
         private List<Stock> stocks;
         private int num = 150;
         private float highest, lowest;
+        private uint maxTurnover;
         private double width;
         private Stock stock;
         private int max;
@@ -60,7 +61,7 @@ namespace AnalyzePastData
                 canvas.Children.Add(new Rectangle());
                 Panel.SetZIndex(canvas.Children[canvas.Children.Count - 1], 1);
                 Panel.SetZIndex(canvas.Children[canvas.Children.Count - 2], 0);
-
+                canvasT.Children.Add(new Rectangle());
             }
         }
 
@@ -85,7 +86,7 @@ namespace AnalyzePastData
                 rect2.Width = 1;
                 rect2.Stroke = brush;
                 Canvas.SetTop(rect2, (highest - stock.DayLines[i].High) / x);
-                Canvas.SetLeft(rect2, width * (i - (stock.DayLines.Count - 1 - num) - 1) + width * 2 / 5);
+                Canvas.SetLeft(rect2, width * (i - (stock.DayLines.Count - 1 - num) - 1) + width * 2 / 5 );
             }
             for (int i = stock.DayLines.Count; i < max; i++)
             {
@@ -93,6 +94,29 @@ namespace AnalyzePastData
                 rect1.Height = 0;
                 Rectangle rect2 = canvas.Children[i * 2] as Rectangle;
                 rect2.Height = 0;
+                Rectangle rect = canvasT.Children[i] as Rectangle;
+                rect.Height = 0;
+            }
+            SetTurnover();
+        }
+
+        private void SetTurnover()
+        {
+            SetMaxTurnover();
+            for (int i = stock.DayLines.Count - 1; i >= 0; i--)
+            {
+                Rectangle rect = canvasT.Children[i] as Rectangle;
+                double x = maxTurnover / canvasT.ActualHeight;
+                rect.Height = stock.DayLines[i].Turnover / x + 1;
+                rect.Width = width * 4 / 5;
+                if (i == 0) rect.Stroke = Brushes.Red;
+                else
+                {
+                    if (stock.DayLines[i].Close >= stock.DayLines[i - 1].Close) { rect.Fill = Brushes.Black; rect.Stroke = Brushes.Red; }
+                    else { rect.Fill = Brushes.Cyan; rect.Stroke = Brushes.Cyan; }
+                }
+                Canvas.SetTop(rect, (maxTurnover - stock.DayLines[i].Turnover) / x);
+                Canvas.SetLeft(rect, width * (i - (stock.DayLines.Count - 1 - num) - 1));
             }
         }
 
@@ -106,6 +130,15 @@ namespace AnalyzePastData
                 lowest = Math.Min(stock.DayLines[i].Low, lowest);
             }
             width = canvas.ActualWidth / num;
+        }
+
+        private void SetMaxTurnover()
+        {
+            maxTurnover = 0;
+            for (int i = stock.DayLines.Count > num ? stock.DayLines.Count - num : 0; i < stock.DayLines.Count; i++)
+            {
+                maxTurnover = Math.Max(maxTurnover, stock.DayLines[i].Turnover);
+            }
         }
 
         private void canvas_Loaded(object sender, RoutedEventArgs e)
@@ -141,9 +174,10 @@ namespace AnalyzePastData
         {
             switch (e.Key)
             {
-                case Key.Up: num /= 2;
+                case Key.Up: num = (int)(num * 0.75);
+                    if (num < 20) num = 20;
                     break;
-                case Key.Down: num *= 2;
+                case Key.Down: num = (int)(num / 0.75);
                     break;
                 default: return;
             }
