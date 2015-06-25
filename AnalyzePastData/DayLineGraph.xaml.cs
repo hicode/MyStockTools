@@ -70,7 +70,7 @@ namespace AnalyzePastData
             SetBound();
             for (int i = stock.DayLines.Count - 1; i >= 0; i--)
             {
-                Rectangle rect1 = canvas.Children[i * 2 + 1] as Rectangle;
+                Rectangle rect1 = canvas.Children[i * 2 + 2] as Rectangle;
                 double height = stock.DayLines[i].Open - stock.DayLines[i].Close;
                 Brush brush = height <= 0 ? Brushes.Red : Brushes.Cyan;
                 rect1.Stroke = brush;
@@ -81,18 +81,18 @@ namespace AnalyzePastData
                 rect1.Height = Math.Abs(height) / x + 1;
                 Canvas.SetTop(rect1, (highest - Math.Max(stock.DayLines[i].Open, stock.DayLines[i].Close)) / x);
                 Canvas.SetLeft(rect1, width * (i - (stock.DayLines.Count - 1 - num) - 1));
-                Rectangle rect2 = canvas.Children[i * 2] as Rectangle;
+                Rectangle rect2 = canvas.Children[i * 2 + 1] as Rectangle;
                 rect2.Height = (stock.DayLines[i].High - stock.DayLines[i].Low) / x;
                 rect2.Width = 1;
                 rect2.Stroke = brush;
                 Canvas.SetTop(rect2, (highest - stock.DayLines[i].High) / x);
-                Canvas.SetLeft(rect2, width * (i - (stock.DayLines.Count - 1 - num) - 1) + width * 2 / 5 );
+                Canvas.SetLeft(rect2, width * (i - (stock.DayLines.Count - 1 - num) - 1) + width * 2 / 5);
             }
             for (int i = stock.DayLines.Count; i < max; i++)
             {
-                Rectangle rect1 = canvas.Children[i * 2 + 1] as Rectangle;
+                Rectangle rect1 = canvas.Children[i * 2 + 2] as Rectangle;
                 rect1.Height = 0;
-                Rectangle rect2 = canvas.Children[i * 2] as Rectangle;
+                Rectangle rect2 = canvas.Children[i * 2 + 1] as Rectangle;
                 rect2.Height = 0;
                 Rectangle rect = canvasT.Children[i] as Rectangle;
                 rect.Height = 0;
@@ -205,8 +205,29 @@ namespace AnalyzePastData
         {
             canvas.Focus();
             Keyboard.Focus(canvas);
+            int i = stock.DayLines.Count - (num - (int)(e.GetPosition(canvas).X / width));
+            DataToShow data = this.FindResource("mousePanel") as DataToShow;
+            uint date = stock.DayLines[i].Date;
+            uint day = date >> 24;
+            uint month = (date & 0x00FF0000) >> 16;
+            uint year = date & 0x0000FFFF;
+            data.Date = year + "/" + month + "/" + day;
+            data.Open = stock.DayLines[i].Open;
+            data.Close = stock.DayLines[i].Close;
+            data.High = stock.DayLines[i].High;
+            data.Low = stock.DayLines[i].Low;
+            data.Turnover = stock.DayLines[i].Turnover;
+            data.Volume = stock.DayLines[i].Volume;
+            //data.Up = (float)((int)(stock.DayLines[i].Close * 100) - (int)(stock.DayLines[i - 1].Close * 100)) / 100;
+            data.Up = (stock.DayLines[i].Close - stock.DayLines[i - 1].Close).ToString("#0.00");
+            data.UpPercent = stock.DayLines[i].Close / stock.DayLines[i - 1].Close - 1;
+            data.OpenColor = SetColor(i, data.Open);
+            data.CloseColor = SetColor(i, data.Close);
+            data.HighColor = SetColor(i, data.High);
+            data.LowColor = SetColor(i, data.Low);
+            Status.Visibility = Visibility.Visible;
         }
 
-        
+
     }
 }

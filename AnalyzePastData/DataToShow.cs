@@ -150,5 +150,43 @@ namespace AnalyzePastData
         // Using a DependencyProperty as the backing store for OpenColor.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty LowColorProperty =
             DependencyProperty.Register("LowColor", typeof(Brush), typeof(DataToShow));
+
+
+
+        public string Date
+        {
+            get { return (string)GetValue(DateProperty); }
+            set { SetValue(DateProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Date.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DateProperty =
+            DependencyProperty.Register("Date", typeof(string), typeof(DataToShow), new PropertyMetadata(@"2015/6/25"));
+
+
+
+        public string Up
+        {
+            get { return (string)GetValue(UpProperty); }
+            set { SetValue(UpProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Up.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty UpProperty =
+            DependencyProperty.Register("Up", typeof(string), typeof(DataToShow));
+
+
+
+        public float UpPercent
+        {
+            get { return (float)GetValue(UpPercentProperty); }
+            set { SetValue(UpPercentProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for UpPercent.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty UpPercentProperty =
+            DependencyProperty.Register("UpPercent", typeof(float), typeof(DataToShow));
+
+        
     }
 }
