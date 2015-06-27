@@ -37,53 +37,53 @@ namespace AnalyzePastData
 
         
 
-        public float Open
+        public string Open
         {
-            get { return (float)GetValue(OpenProperty); }
+            get { return (string)GetValue(OpenProperty); }
             set { SetValue(OpenProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for Open.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty OpenProperty =
-            DependencyProperty.Register("Open", typeof(float), typeof(DataToShow), new PropertyMetadata(default(float)));
+            DependencyProperty.Register("Open", typeof(string), typeof(DataToShow));
 
 
 
 
-        public float Close
+        public string Close
         {
-            get { return (float)GetValue(CloseProperty); }
+            get { return (string)GetValue(CloseProperty); }
             set { SetValue(CloseProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for Close.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty CloseProperty =
-            DependencyProperty.Register("Close", typeof(float), typeof(DataToShow), new PropertyMetadata(default(float)));
+            DependencyProperty.Register("Close", typeof(string), typeof(DataToShow));
 
 
 
 
-        public float High
+        public string High
         {
-            get { return (float)GetValue(HighProperty); }
+            get { return (string)GetValue(HighProperty); }
             set { SetValue(HighProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for High.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty HighProperty =
-            DependencyProperty.Register("High", typeof(float), typeof(DataToShow), new PropertyMetadata(default(float)));
+            DependencyProperty.Register("High", typeof(string), typeof(DataToShow));
 
 
 
-        public float Low
+        public string Low
         {
-            get { return (float)GetValue(LowProperty); }
+            get { return (string)GetValue(LowProperty); }
             set { SetValue(LowProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for Low.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty LowProperty =
-            DependencyProperty.Register("Low", typeof(float), typeof(DataToShow), new PropertyMetadata(default(float)));
+            DependencyProperty.Register("Low", typeof(string), typeof(DataToShow));
 
 
 

@@ -21,10 +21,10 @@
         <Border Grid.Column="1" Grid.RowSpan="2" BorderBrush="Red" BorderThickness="1" Panel.ZIndex="1"/>
         <Border Grid.Column="1" Grid.Row="1" BorderBrush="Red" BorderThickness="1" Panel.ZIndex="1"/>
 
-        <ListBox x:Name="stockList" Grid.Column="0" Grid.RowSpan="2" Background="Black" Foreground="Yellow" SelectionMode="Single" SelectedIndex="0" SelectionChanged="stockList_SelectionChanged">
+        <ListBox x:Name="stockList" Grid.Column="0" Grid.RowSpan="2" Background="Black" Foreground="Yellow" SelectionMode="Single" SelectedIndex="0" SelectionChanged="stockList_SelectionChanged" GotFocus="stockList_GotFocus">
 
         </ListBox>
-        <Canvas x:Name="canvas" Loaded="canvas_Loaded" Background="Black" KeyDown="canvas_KeyDown" SizeChanged="canvas_Resize" Grid.Column="1" Grid.Row="0" ClipToBounds="True" Focusable="True" IsEnabled="True" MouseDown="canvas_MouseDown">
+        <Canvas x:Name="canvas" Loaded="canvas_Loaded" Background="Black" KeyDown="canvas_KeyDown" SizeChanged="canvas_Resize" Grid.Column="1" Grid.Row="0" ClipToBounds="True" Focusable="True" IsEnabled="True" MouseDown="canvas_MouseDown" MouseMove="canvas_MouseMove">
             <Border x:Name="Status" BorderBrush="DarkGray" Height="260" BorderThickness="1" Panel.ZIndex="2" Visibility="Hidden">
                 <StackPanel Width="87"  Background="Black" DataContext="{DynamicResource mousePanel}"  >
                     <TextBlock TextWrapping="Wrap" Text="{Binding Date}" Foreground="Gray"/>

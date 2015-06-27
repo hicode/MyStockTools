@@ -26,6 +26,10 @@ namespace AnalyzePastData
         private double width;
         private Stock stock;
         private int max;
+        private bool mouseOn = false;
+        private bool keyOn = false;
+        private Rectangle singleLine = new Rectangle() { Stroke = Brushes.DarkGray, Width = 1, Height = 1200, SnapsToDevicePixels = true };
+        private Rectangle singleLine1 = new Rectangle() { Stroke = Brushes.DarkGray, Width = 1, Height = 1200, SnapsToDevicePixels = true };
 
         public DayLineGraph()
         {
@@ -57,11 +61,11 @@ namespace AnalyzePastData
         {
             for (int i = 0; i < max; i++)
             {
-                canvas.Children.Add(new Rectangle());
-                canvas.Children.Add(new Rectangle());
+                canvas.Children.Add(new Rectangle() { SnapsToDevicePixels = true });
+                canvas.Children.Add(new Rectangle() { SnapsToDevicePixels = true });
                 Panel.SetZIndex(canvas.Children[canvas.Children.Count - 1], 1);
                 Panel.SetZIndex(canvas.Children[canvas.Children.Count - 2], 0);
-                canvasT.Children.Add(new Rectangle());
+                canvasT.Children.Add(new Rectangle() { SnapsToDevicePixels = true });
             }
         }
 
@@ -73,6 +77,7 @@ namespace AnalyzePastData
                 Rectangle rect1 = canvas.Children[i * 2 + 2] as Rectangle;
                 double height = stock.DayLines[i].Open - stock.DayLines[i].Close;
                 Brush brush = height <= 0 ? Brushes.Red : Brushes.Cyan;
+                if (Math.Abs(height) < 0.0001) brush = stock.DayLines[i].Close >= stock.DayLines[i - 1].Close ? Brushes.Red : Brushes.Cyan;
                 rect1.Stroke = brush;
                 if (height > 0) rect1.Fill = brush;
                 else rect1.Fill = Brushes.Black;
@@ -153,10 +158,10 @@ namespace AnalyzePastData
             data.Code = stock.Code;
             data.Name = stock.Name;
             int count = stock.DayLines.Count;
-            data.Open = count == 0 ? 0 : stock.DayLines[count - 1].Open;
-            data.Close = count == 0 ? 0 : stock.DayLines[count - 1].Close;
-            data.High = count == 0 ? 0 : stock.DayLines[count - 1].High;
-            data.Low = count == 0 ? 0 : stock.DayLines[count - 1].Low;
+            data.Open = (count == 0 ? 0 : stock.DayLines[count - 1].Open).ToString("#0.00");
+            data.Close = (count == 0 ? 0 : stock.DayLines[count - 1].Close).ToString("#0.00");
+            data.High = (count == 0 ? 0 : stock.DayLines[count - 1].High).ToString("#0.00");
+            data.Low = (count == 0 ? 0 : stock.DayLines[count - 1].Low).ToString("#0.00");
             data.Turnover = count == 0 ? 0 : stock.DayLines[count - 1].Turnover;
             data.Volume = count == 0 ? 0 : stock.DayLines[count - 1].Volume;
             data.OpenColor = count < 2 ? Brushes.Cyan : SetColor(count - 1, stock.DayLines[count - 1].Open);
@@ -167,17 +172,44 @@ namespace AnalyzePastData
 
         private Brush SetColor(int i, float value)
         {
-            return value >= stock.DayLines[i - 1].Close ? Brushes.Red : Brushes.Green;
+            return value >= stock.DayLines[i - 1].Close ? Brushes.Red : Brushes.LightGreen;
         }
 
         private void canvas_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
-                case Key.Up: num = (int)(num * 0.75);
+                case Key.Up:
+                    num = (int)(num * 0.75);
                     if (num < 20) num = 20;
                     break;
-                case Key.Down: num = (int)(num / 0.75);
+                case Key.Down:
+                    num = (int)(num / 0.75);
+                    break;
+                case Key.Left:
+                    if (!mouseOn) break;
+                    keyOn = true;
+                    double x = Canvas.GetLeft(singleLine);
+                    if (x < width) break;
+                    x = ((int)(x / width) - 1) * width + width * 2 / 5;
+                    SetSingleLine(x);
+                    int i = stock.DayLines.Count - (num - (int)(x / width));
+                    SetStatusPanel(i);
+                    break;
+                case Key.Right:
+                    if (!mouseOn) break;
+                    keyOn = true;
+                    double xx = Canvas.GetLeft(singleLine);
+                    if (xx < width) break;
+                    xx = ((int)(xx / width) + 1) * width + width * 2 / 5;
+                    SetSingleLine(xx);
+                    int ii = stock.DayLines.Count - (num - (int)(xx / width));
+                    SetStatusPanel(ii);
+                    break;
+                case Key.Escape:
+                    if (mouseOn) { canvas.Children.Remove(singleLine); canvasT.Children.Remove(singleLine1); }
+                    mouseOn = false;
+                    Status.Visibility = Visibility.Hidden;
                     break;
                 default: return;
             }
@@ -206,26 +238,59 @@ namespace AnalyzePastData
             canvas.Focus();
             Keyboard.Focus(canvas);
             int i = stock.DayLines.Count - (num - (int)(e.GetPosition(canvas).X / width));
+            SetStatusPanel(i);
+            if (!mouseOn) { canvas.Children.Add(singleLine); canvasT.Children.Add(singleLine1); }
+            mouseOn = true;
+            keyOn = false;
+            double x = e.GetPosition(canvas).X;
+            SetSingleLine(x);
+        }
+
+        private void SetSingleLine(double x)
+        {
+            Canvas.SetLeft(singleLine, x);
+            Canvas.SetLeft(singleLine1, x);
+        }
+
+        private void SetStatusPanel(int i)
+        {
             DataToShow data = this.FindResource("mousePanel") as DataToShow;
             uint date = stock.DayLines[i].Date;
             uint day = date >> 24;
             uint month = (date & 0x00FF0000) >> 16;
             uint year = date & 0x0000FFFF;
             data.Date = year + "/" + month + "/" + day;
-            data.Open = stock.DayLines[i].Open;
-            data.Close = stock.DayLines[i].Close;
-            data.High = stock.DayLines[i].High;
-            data.Low = stock.DayLines[i].Low;
+            data.Open = (stock.DayLines[i].Open).ToString("#0.00");
+            data.Close = (stock.DayLines[i].Close).ToString("#0.00");
+            data.High = (stock.DayLines[i].High).ToString("#0.00");
+            data.Low = (stock.DayLines[i].Low).ToString("#0.00");
             data.Turnover = stock.DayLines[i].Turnover;
             data.Volume = stock.DayLines[i].Volume;
-            //data.Up = (float)((int)(stock.DayLines[i].Close * 100) - (int)(stock.DayLines[i - 1].Close * 100)) / 100;
             data.Up = (stock.DayLines[i].Close - stock.DayLines[i - 1].Close).ToString("#0.00");
             data.UpPercent = stock.DayLines[i].Close / stock.DayLines[i - 1].Close - 1;
-            data.OpenColor = SetColor(i, data.Open);
-            data.CloseColor = SetColor(i, data.Close);
-            data.HighColor = SetColor(i, data.High);
-            data.LowColor = SetColor(i, data.Low);
+            data.OpenColor = SetColor(i, stock.DayLines[i].Open);
+            data.CloseColor = SetColor(i, stock.DayLines[i].Close);
+            data.HighColor = SetColor(i, stock.DayLines[i].High);
+            data.LowColor = SetColor(i, stock.DayLines[i].Low);
             Status.Visibility = Visibility.Visible;
+        }
+
+        private void canvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!mouseOn) return;
+            if (keyOn) return;
+            keyOn = false;
+            int i = stock.DayLines.Count - (num - (int)(e.GetPosition(canvas).X / width));
+            SetStatusPanel(i);
+            double x = e.GetPosition(canvas).X;
+            SetSingleLine(x);
+        }
+
+        private void stockList_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (mouseOn) { canvas.Children.Remove(singleLine); canvasT.Children.Remove(singleLine1); }
+            mouseOn = false;
+            Status.Visibility = Visibility.Hidden;
         }
 
 
