@@ -31,6 +31,13 @@ namespace AnalyzePastData
         private Rectangle singleLine = new Rectangle() { Stroke = Brushes.DarkGray, Width = 1, Height = 1200, SnapsToDevicePixels = true };
         private Rectangle singleLine1 = new Rectangle() { Stroke = Brushes.DarkGray, Width = 1, Height = 1200, SnapsToDevicePixels = true };
 
+        private List<float> average5;
+        private List<float> average10;
+        private List<float> average20;
+        private List<float> average60;
+        private List<float> average120;
+        private Path path5, path10, path20, path60, path120;
+
         public DayLineGraph()
         {
             uint startDate = Utilities.DateToUint(2007, 10, 1);
@@ -45,8 +52,18 @@ namespace AnalyzePastData
             AddList();
             stock = stocks[stockList.SelectedIndex];
             AddGraph();
+            GetAverageList();
             canvas.Focus();
             Keyboard.Focus(canvas);
+        }
+
+        private void GetAverageList()
+        {
+            average5 = GetAverage(5);
+            average10 = GetAverage(10);
+            average20 = GetAverage(20);
+            average60 = GetAverage(60);
+            average120 = GetAverage(120);
         }
 
         private void AddList()
@@ -148,8 +165,37 @@ namespace AnalyzePastData
 
         private void canvas_Loaded(object sender, RoutedEventArgs e)
         {
-            SetUnits();
+            //SetUnits();
             ChangeStock();
+            //AddAverage();
+        }
+
+        private void AddAverage()
+        {
+            AddAverageLine(average5, Brushes.DarkGray, 5, ref path5);
+            AddAverageLine(average10, Brushes.Yellow, 10, ref path10);
+            AddAverageLine(average20, Brushes.Purple, 20, ref path20);
+            AddAverageLine(average60, Brushes.Blue, 60, ref path60);
+            AddAverageLine(average120, Brushes.Green, 120, ref path120);
+        }
+
+        private void AddAverageLine(List<float> average, Brush brush, int n, ref Path path)
+        {
+            if (average.Count < 2) return;
+            double x = (highest - lowest) / canvas.ActualHeight;
+            PathFigure LineFigure = new PathFigure() { IsClosed = false };
+            LineFigure.StartPoint = new Point(width * (num - stock.DayLines.Count + n - 1) + width * 2 / 5, (highest - average[0]) / x);
+            PathSegmentCollection pathCollection = new PathSegmentCollection();
+            for (int i = 1; i < average.Count; i++)
+            {
+                pathCollection.Add(new LineSegment(new Point(width * (i - (stock.DayLines.Count - 1 - num) - 1 + n - 1) + width * 2 / 5,
+                    (highest - average[i]) / x), true));
+            }
+            LineFigure.Segments = pathCollection;
+            PathGeometry lineGeometry = new PathGeometry();
+            lineGeometry.Figures.Add(LineFigure);
+            path = new Path() { Stroke = brush, StrokeThickness = 1, Data = lineGeometry };
+            canvas.Children.Add(path);
         }
 
         private void ChangeStock()
@@ -177,14 +223,17 @@ namespace AnalyzePastData
 
         private void canvas_KeyDown(object sender, KeyEventArgs e)
         {
+            bool needToRedraw = false;
             switch (e.Key)
             {
                 case Key.Up:
                     num = (int)(num * 0.75);
                     if (num < 20) num = 20;
+                    needToRedraw = true;
                     break;
                 case Key.Down:
                     num = (int)(num / 0.75);
+                    needToRedraw = true;
                     break;
                 case Key.Left:
                     if (!mouseOn) break;
@@ -213,14 +262,31 @@ namespace AnalyzePastData
                     break;
                 default: return;
             }
-            SetUnits();
+            if (needToRedraw)
+            {
+                RemoveAverage();
+                SetUnits();
+                AddAverage();
+            }
+
             e.Handled = true;
+        }
+
+        private void RemoveAverage()
+        {
+            canvas.Children.Remove(path5);
+            canvas.Children.Remove(path10);
+            canvas.Children.Remove(path20);
+            canvas.Children.Remove(path60);
+            canvas.Children.Remove(path120);
         }
 
 
         private void canvas_Resize(object sender, SizeChangedEventArgs e)
         {
+            RemoveAverage();
             SetUnits();
+            AddAverage();
         }
 
 
@@ -228,9 +294,12 @@ namespace AnalyzePastData
         {
             if (canvas.Children.Count < max) return;
 
+            RemoveAverage();
             stock = stocks[stockList.SelectedIndex];
             SetUnits();
             ChangeStock();
+            GetAverageList();
+            AddAverage();
         }
 
         private void canvas_MouseDown(object sender, MouseButtonEventArgs e)
@@ -293,6 +362,19 @@ namespace AnalyzePastData
             Status.Visibility = Visibility.Hidden;
         }
 
-
+        private List<float> GetAverage(int n)
+        {
+            var list = new List<float>();
+            int j = 0;
+            float sum = 0;
+            for (int i = 0; i < stock.DayLines.Count; i++)
+            {
+                if (i < n - 1) { sum += stock.DayLines[i].Close; continue; }
+                sum += stock.DayLines[i].Close;
+                list.Add(sum / n);
+                sum -= stock.DayLines[j++].Close;
+            }
+            return list;
+        }
     }
 }
