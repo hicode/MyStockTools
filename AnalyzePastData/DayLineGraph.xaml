@@ -6,6 +6,9 @@
     <Window.Resources>
         <local:DataToShow x:Key="rightPanel"/>
         <local:DataToShow x:Key="mousePanel"/>
+        <local:DataConverter1 x:Key="con1"/>
+        <local:DataConverter2 x:Key="con2"/>
+        <local:DataConverter3 x:Key="con3"/>
     </Window.Resources>
     <Grid >
         <Grid.ColumnDefinitions>
@@ -46,7 +49,17 @@
                 <TextBlock  Text="  120日均线: " Foreground="Green"></TextBlock>
                 <TextBlock  x:Name="text120" Text="5日均线:" Foreground="Green"></TextBlock>
             </StackPanel>
+            <Canvas Grid.Column="1" Grid.RowSpan="3">
+                <TextBlock x:Name="scale1" Text="hahah" Foreground="DarkGray" Margin="0,8" Canvas.Top="{Binding ElementName=canvas, Path=0}"/>
+                <TextBlock x:Name="scale2" Text="hahah" Foreground="DarkGray" Margin="0,8" Canvas.Top="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource con1}}"/>
+                <TextBlock x:Name="scale3" Text="hahah" Foreground="DarkGray" Margin="0,8" Canvas.Top="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource con2}}"/>
+                <TextBlock x:Name="scale4" Text="hahah" Foreground="DarkGray" Margin="0,8" Canvas.Top="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource con3}}"/>
+                <TextBlock x:Name="scale5" Text="hahah" Foreground="DarkGray" Margin="0,8" Canvas.Top="{Binding ElementName=canvas, Path=ActualHeight}"/>
+            </Canvas>
             <Canvas x:Name="canvas" Loaded="canvas_Loaded" Background="Black" KeyDown="canvas_KeyDown" SizeChanged="canvas_Resize" Grid.Column="0" Grid.Row="1" ClipToBounds="True" Focusable="True" IsEnabled="True" MouseDown="canvas_MouseDown" MouseMove="canvas_MouseMove">
+                <Line SnapsToDevicePixels="True" X1="0" Y1="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource con1}}" X2="{Binding ElementName=canvas, Path=ActualWidth}" Y2="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource con1}}" Stroke="DarkGray" StrokeThickness="1" StrokeDashArray="2,4"/>
+                <Line SnapsToDevicePixels="True" X1="0" Y1="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource con2}}" X2="{Binding ElementName=canvas, Path=ActualWidth}" Y2="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource con2}}" Stroke="DarkGray" StrokeThickness="1" StrokeDashArray="2,4"/>
+                <Line SnapsToDevicePixels="True" X1="0" Y1="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource con3}}" X2="{Binding ElementName=canvas, Path=ActualWidth}" Y2="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource con3}}" Stroke="DarkGray" StrokeThickness="1" StrokeDashArray="2,4"/>
                 <Border x:Name="Status" BorderBrush="DarkGray" Height="260" BorderThickness="1" Panel.ZIndex="2" Visibility="Hidden">
                     <StackPanel Width="87"  Background="Black" DataContext="{DynamicResource mousePanel}"  >
                         <TextBlock TextWrapping="Wrap" Text="{Binding Date}" Foreground="Gray"/>
@@ -81,6 +94,8 @@
             <TextBlock TextWrapping="Wrap" Text="收盘" Foreground="White" Margin="5,0,0,0"/>
             <TextBlock TextWrapping="Wrap" Text="最高" Foreground="White" Margin="5,0,0,0"/>
             <TextBlock TextWrapping="Wrap" Text="最低" Foreground="White" Margin="5,0,0,0"/>
+            <TextBlock TextWrapping="Wrap" Text="上涨" Foreground="White" Margin="5,0,0,0"/>
+            <TextBlock TextWrapping="Wrap" Text="涨幅" Foreground="White" Margin="5,0,0,0"/>
             <TextBlock TextWrapping="Wrap" Text="成交量" Foreground="White" Margin="5,0,0,0"/>
             <TextBlock TextWrapping="Wrap" Text="成交额" Foreground="White" Margin="5,0,0,0"/>
         </StackPanel>
@@ -90,9 +105,14 @@
             <TextBlock TextWrapping="Wrap" Text="{Binding Close}" Foreground="{Binding CloseColor}" Margin="3,0,0,0" HorizontalAlignment="Right"/>
             <TextBlock TextWrapping="Wrap" Text="{Binding High}" Foreground="{Binding HighColor}" Margin="3,0,0,0" HorizontalAlignment="Right"/>
             <TextBlock TextWrapping="Wrap" Text="{Binding Low}" Foreground="{Binding LowColor}" Margin="3,0,0,0" HorizontalAlignment="Right"/>
+            <TextBlock TextWrapping="Wrap" Text="{Binding Up}" Foreground="{Binding CloseColor}" HorizontalAlignment="Right" />
+            <TextBlock TextWrapping="Wrap" Foreground="{Binding CloseColor}" HorizontalAlignment="Right">
+                <TextBlock.Text>
+                    <Binding Path="UpPercent" StringFormat="{}{0:P}"/>
+                </TextBlock.Text>
+            </TextBlock>
             <TextBlock TextWrapping="Wrap" Text="{Binding Turnover}" Foreground="Cyan" Margin="3,0,0,0" HorizontalAlignment="Right"/>
             <TextBlock TextWrapping="Wrap" Text="{Binding Volume}" Foreground="Cyan" Margin="3,0,0,0" HorizontalAlignment="Right"/>
-
         </StackPanel>
     </Grid>
 </Window>

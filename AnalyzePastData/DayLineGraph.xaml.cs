@@ -20,6 +20,7 @@ namespace AnalyzePastData
     public partial class DayLineGraph : Window
     {
         private List<Stock> stocks;
+        private int numOfPreControl;
         private int num = 150;
         private int offset = 0;
         private float highest, lowest;
@@ -49,7 +50,7 @@ namespace AnalyzePastData
                 max = Math.Max(max, stocks[i].DayLines.Count);
             }
             InitializeComponent();
-
+            numOfPreControl = canvas.Children.Count;
             AddList();
             stock = stocks[stockList.SelectedIndex];
             AddGraph();
@@ -92,7 +93,7 @@ namespace AnalyzePastData
             SetBound();
             for (int i = stock.DayLines.Count - 1; i >= 0; i--)
             {
-                Rectangle rect1 = canvas.Children[i * 2 + 2] as Rectangle;
+                Rectangle rect1 = canvas.Children[i * 2 + 1 + numOfPreControl] as Rectangle;
                 double height = stock.DayLines[i].Open - stock.DayLines[i].Close;
                 Brush brush = height <= 0 ? Brushes.Red : Brushes.Cyan;
                 if (Math.Abs(height) < 0.0001) brush = stock.DayLines[i].Close >= stock.DayLines[i - 1].Close ? Brushes.Red : Brushes.Cyan;
@@ -104,7 +105,7 @@ namespace AnalyzePastData
                 rect1.Height = Math.Abs(height) / x + 1;
                 Canvas.SetTop(rect1, (highest - Math.Max(stock.DayLines[i].Open, stock.DayLines[i].Close)) / x);
                 Canvas.SetLeft(rect1, width * (i - (stock.DayLines.Count - 1 - num) - 1 + offset));
-                Rectangle rect2 = canvas.Children[i * 2 + 1] as Rectangle;
+                Rectangle rect2 = canvas.Children[i * 2 + numOfPreControl] as Rectangle;
                 rect2.Height = (stock.DayLines[i].High - stock.DayLines[i].Low) / x;
                 rect2.Width = 1;
                 rect2.Stroke = brush;
@@ -113,9 +114,9 @@ namespace AnalyzePastData
             }
             for (int i = stock.DayLines.Count; i < max; i++)
             {
-                Rectangle rect1 = canvas.Children[i * 2 + 2] as Rectangle;
+                Rectangle rect1 = canvas.Children[i * 2 + 1 + numOfPreControl] as Rectangle;
                 rect1.Height = 0;
-                Rectangle rect2 = canvas.Children[i * 2 + 1] as Rectangle;
+                Rectangle rect2 = canvas.Children[i * 2 + numOfPreControl] as Rectangle;
                 rect2.Height = 0;
                 Rectangle rect = canvasT.Children[i] as Rectangle;
                 rect.Height = 0;
@@ -153,6 +154,17 @@ namespace AnalyzePastData
                 lowest = Math.Min(stock.DayLines[i].Low, lowest);
             }
             width = canvas.ActualWidth / num;
+            SetScale();
+        }
+
+        private void SetScale()
+        {
+            double x = highest - lowest;
+            scale1.Text = highest.ToString("#0.00");
+            scale2.Text = (highest - x / 4).ToString("#0.00");
+            scale3.Text = (highest - x / 2).ToString("#0.00");
+            scale4.Text = (highest - x * 3 / 4).ToString("#0.00");
+            scale5.Text = lowest.ToString("#0.00");
         }
 
         private void SetMaxTurnover()
@@ -215,6 +227,8 @@ namespace AnalyzePastData
             data.CloseColor = count < 2 ? Brushes.Cyan : SetColor(count - 1, stock.DayLines[count - 1].Close);
             data.HighColor = count < 2 ? Brushes.Cyan : SetColor(count - 1, stock.DayLines[count - 1].High);
             data.LowColor = count < 2 ? Brushes.Cyan : SetColor(count - 1, stock.DayLines[count - 1].Low);
+            data.Up = (count <= 1 ? 0 : stock.DayLines[count - 1].Close - stock.DayLines[count - 2].Close).ToString("#0.00");
+            data.UpPercent = count <= 1 ? 0 : stock.DayLines[count - 1].Close / stock.DayLines[count - 2].Close - 1;
         }
 
         private Brush SetColor(int i, float value)
@@ -241,6 +255,7 @@ namespace AnalyzePastData
                     {
                         offset++;
                         needToRedraw = true;
+                        break;
                     }
                     if (!mouseOn) break;
                     keyOn = true;
@@ -258,6 +273,7 @@ namespace AnalyzePastData
                         if (offset == 0) break;
                         offset--;
                         needToRedraw = true;
+                        break;
                     }
                     if (!mouseOn) break;
                     keyOn = true;
