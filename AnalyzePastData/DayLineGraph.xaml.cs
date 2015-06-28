@@ -21,6 +21,7 @@ namespace AnalyzePastData
     {
         private List<Stock> stocks;
         private int num = 150;
+        private int offset = 0;
         private float highest, lowest;
         private uint maxTurnover;
         private double width;
@@ -102,13 +103,13 @@ namespace AnalyzePastData
                 double x = (highest - lowest) / canvas.ActualHeight;
                 rect1.Height = Math.Abs(height) / x + 1;
                 Canvas.SetTop(rect1, (highest - Math.Max(stock.DayLines[i].Open, stock.DayLines[i].Close)) / x);
-                Canvas.SetLeft(rect1, width * (i - (stock.DayLines.Count - 1 - num) - 1));
+                Canvas.SetLeft(rect1, width * (i - (stock.DayLines.Count - 1 - num) - 1 + offset));
                 Rectangle rect2 = canvas.Children[i * 2 + 1] as Rectangle;
                 rect2.Height = (stock.DayLines[i].High - stock.DayLines[i].Low) / x;
                 rect2.Width = 1;
                 rect2.Stroke = brush;
                 Canvas.SetTop(rect2, (highest - stock.DayLines[i].High) / x);
-                Canvas.SetLeft(rect2, width * (i - (stock.DayLines.Count - 1 - num) - 1) + width * 2 / 5);
+                Canvas.SetLeft(rect2, width * (i - (stock.DayLines.Count - 1 - num) - 1 + offset) + width * 2 / 5);
             }
             for (int i = stock.DayLines.Count; i < max; i++)
             {
@@ -138,7 +139,7 @@ namespace AnalyzePastData
                     else { rect.Fill = Brushes.Cyan; rect.Stroke = Brushes.Cyan; }
                 }
                 Canvas.SetTop(rect, (maxTurnover - stock.DayLines[i].Turnover) / x);
-                Canvas.SetLeft(rect, width * (i - (stock.DayLines.Count - 1 - num) - 1));
+                Canvas.SetLeft(rect, width * (i - (stock.DayLines.Count - 1 - num) - 1 + offset));
             }
         }
 
@@ -146,7 +147,7 @@ namespace AnalyzePastData
         {
             highest = 0;
             lowest = float.MaxValue;
-            for (int i = stock.DayLines.Count > num ? stock.DayLines.Count - num : 0; i < stock.DayLines.Count; i++)
+            for (int i = stock.DayLines.Count > num + offset ? stock.DayLines.Count - num - offset : 0; i < stock.DayLines.Count - offset; i++)
             {
                 highest = Math.Max(stock.DayLines[i].High, highest);
                 lowest = Math.Min(stock.DayLines[i].Low, lowest);
@@ -157,7 +158,7 @@ namespace AnalyzePastData
         private void SetMaxTurnover()
         {
             maxTurnover = 0;
-            for (int i = stock.DayLines.Count > num ? stock.DayLines.Count - num : 0; i < stock.DayLines.Count; i++)
+            for (int i = stock.DayLines.Count > num + offset ? stock.DayLines.Count - num - offset : 0; i < stock.DayLines.Count - offset; i++)
             {
                 maxTurnover = Math.Max(maxTurnover, stock.DayLines[i].Turnover);
             }
@@ -184,11 +185,11 @@ namespace AnalyzePastData
             if (average.Count < 2) return;
             double x = (highest - lowest) / canvas.ActualHeight;
             PathFigure LineFigure = new PathFigure() { IsClosed = false };
-            LineFigure.StartPoint = new Point(width * (num - stock.DayLines.Count + n - 1) + width * 2 / 5, (highest - average[0]) / x);
+            LineFigure.StartPoint = new Point(width * (num - stock.DayLines.Count + n - 1 + offset) + width * 2 / 5, (highest - average[0]) / x);
             PathSegmentCollection pathCollection = new PathSegmentCollection();
             for (int i = 1; i < average.Count; i++)
             {
-                pathCollection.Add(new LineSegment(new Point(width * (i - (stock.DayLines.Count - 1 - num) - 1 + n - 1) + width * 2 / 5,
+                pathCollection.Add(new LineSegment(new Point(width * (i - (stock.DayLines.Count - 1 - num) - 1 + n - 1 + offset) + width * 2 / 5,
                     (highest - average[i]) / x), true));
             }
             LineFigure.Segments = pathCollection;
@@ -236,6 +237,11 @@ namespace AnalyzePastData
                     needToRedraw = true;
                     break;
                 case Key.Left:
+                    if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                    {
+                        offset++;
+                        needToRedraw = true;
+                    }
                     if (!mouseOn) break;
                     keyOn = true;
                     double x = Canvas.GetLeft(singleLine);
@@ -243,16 +249,24 @@ namespace AnalyzePastData
                     x = ((int)(x / width) - 1) * width + width * 2 / 5;
                     SetSingleLine(x);
                     int i = stock.DayLines.Count - (num - (int)(x / width));
+                    SetAverageText(stock.DayLines.Count - 1 - i);
                     SetStatusPanel(i);
                     break;
                 case Key.Right:
+                    if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                    {
+                        if (offset == 0) break;
+                        offset--;
+                        needToRedraw = true;
+                    }
                     if (!mouseOn) break;
                     keyOn = true;
                     double xx = Canvas.GetLeft(singleLine);
-                    if (xx < width) break;
+                    if (xx >= width * (num - 1)) break;
                     xx = ((int)(xx / width) + 1) * width + width * 2 / 5;
                     SetSingleLine(xx);
                     int ii = stock.DayLines.Count - (num - (int)(xx / width));
+                    SetAverageText(stock.DayLines.Count - 1 - ii);
                     SetStatusPanel(ii);
                     break;
                 case Key.Escape:
@@ -287,6 +301,17 @@ namespace AnalyzePastData
             RemoveAverage();
             SetUnits();
             AddAverage();
+            SetAverageText(0);
+        }
+
+        private void SetAverageText(int i)
+        {
+            i += offset;
+            text5.Text = average5[average5.Count - 1 - i].ToString("#0.00");
+            text10.Text = average5[average10.Count - 1 - i].ToString("#0.00");
+            text20.Text = average5[average20.Count - 1 - i].ToString("#0.00");
+            text60.Text = average5[average60.Count - 1 - i].ToString("#0.00");
+            text120.Text = average5[average120.Count - 1 - i].ToString("#0.00");
         }
 
 
@@ -307,6 +332,7 @@ namespace AnalyzePastData
             canvas.Focus();
             Keyboard.Focus(canvas);
             int i = stock.DayLines.Count - (num - (int)(e.GetPosition(canvas).X / width));
+            SetAverageText(stock.DayLines.Count - 1 - i);
             SetStatusPanel(i);
             if (!mouseOn) { canvas.Children.Add(singleLine); canvasT.Children.Add(singleLine1); }
             mouseOn = true;
@@ -323,6 +349,7 @@ namespace AnalyzePastData
 
         private void SetStatusPanel(int i)
         {
+            i -= offset;
             DataToShow data = this.FindResource("mousePanel") as DataToShow;
             uint date = stock.DayLines[i].Date;
             uint day = date >> 24;
@@ -350,6 +377,7 @@ namespace AnalyzePastData
             if (keyOn) return;
             keyOn = false;
             int i = stock.DayLines.Count - (num - (int)(e.GetPosition(canvas).X / width));
+            SetAverageText(stock.DayLines.Count - 1 - i);
             SetStatusPanel(i);
             double x = e.GetPosition(canvas).X;
             SetSingleLine(x);

@@ -11,7 +11,6 @@ namespace AnalyzePastData
     class DataToShow : DependencyObject
     {
 
-
         public string Code
         {
             get { return (string)GetValue(CodeProperty); }

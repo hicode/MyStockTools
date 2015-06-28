@@ -18,40 +18,63 @@
             <RowDefinition/>
             <RowDefinition Height="200"/>
         </Grid.RowDefinitions>
-        <Border Grid.Column="1" Grid.RowSpan="2" BorderBrush="Red" BorderThickness="1" Panel.ZIndex="1"/>
-        <Border Grid.Column="1" Grid.Row="1" BorderBrush="Red" BorderThickness="1" Panel.ZIndex="1"/>
 
         <ListBox x:Name="stockList" Grid.Column="0" Grid.RowSpan="2" Background="Black" Foreground="Yellow" SelectionMode="Single" SelectedIndex="0" SelectionChanged="stockList_SelectionChanged" GotFocus="stockList_GotFocus">
 
         </ListBox>
-        <Canvas x:Name="canvas" Loaded="canvas_Loaded" Background="Black" KeyDown="canvas_KeyDown" SizeChanged="canvas_Resize" Grid.Column="1" Grid.Row="0" ClipToBounds="True" Focusable="True" IsEnabled="True" MouseDown="canvas_MouseDown" MouseMove="canvas_MouseMove">
-            <Border x:Name="Status" BorderBrush="DarkGray" Height="260" BorderThickness="1" Panel.ZIndex="2" Visibility="Hidden">
-                <StackPanel Width="87"  Background="Black" DataContext="{DynamicResource mousePanel}"  >
-                    <TextBlock TextWrapping="Wrap" Text="{Binding Date}" Foreground="Gray"/>
-                    <TextBlock TextWrapping="Wrap" Text="开盘" Foreground="Gray"/>
-                    <TextBlock TextWrapping="Wrap" Text="{Binding Open}" Foreground="{Binding OpenColor}" HorizontalAlignment="Right"/>
-                    <TextBlock TextWrapping="Wrap" Text="收盘" Foreground="Gray"/>
-                    <TextBlock TextWrapping="Wrap" Text="{Binding Close}" Foreground="{Binding CloseColor}" HorizontalAlignment="Right"/>
-                    <TextBlock TextWrapping="Wrap" Text="最高" Foreground="Gray"/>
-                    <TextBlock TextWrapping="Wrap" Text="{Binding High}" Foreground="{Binding HighColor}" HorizontalAlignment="Right"/>
-                    <TextBlock TextWrapping="Wrap" Text="最低" Foreground="Gray"/>
-                    <TextBlock TextWrapping="Wrap" Text="{Binding Low}" Foreground="{Binding LowColor}" HorizontalAlignment="Right"/>
-                    <TextBlock TextWrapping="Wrap" Text="成交量" Foreground="Gray"/>
-                    <TextBlock TextWrapping="Wrap" Text="{Binding Turnover}" Foreground="Cyan" HorizontalAlignment="Right"/>
-                    <TextBlock TextWrapping="Wrap" Text="成交额" Foreground="Gray"/>
-                    <TextBlock TextWrapping="Wrap" Text="{Binding Volume}" Foreground="Cyan" HorizontalAlignment="Right"/>
-                    <TextBlock TextWrapping="Wrap" Text="上涨" Foreground="Gray"/>
-                    <TextBlock TextWrapping="Wrap" Text="{Binding Up}" Foreground="{Binding CloseColor}" HorizontalAlignment="Right" />
-                    <TextBlock TextWrapping="Wrap" Text="涨幅" Foreground="Gray"/>
-                    <TextBlock TextWrapping="Wrap" Foreground="{Binding CloseColor}" HorizontalAlignment="Right">
-                        <TextBlock.Text>
-                            <Binding Path="UpPercent" StringFormat="{}{0:P}"/>
-                        </TextBlock.Text>
-                    </TextBlock>
-                </StackPanel>
-            </Border>
-        </Canvas>
-        <Canvas x:Name="canvasT" Grid.Column="1" Grid.Row="1" ClipToBounds="True" Focusable="True" IsEnabled="True" Background="Black" KeyDown="canvas_KeyDown" MouseDown="canvas_MouseDown"/>
+        <Grid Grid.Column="1" Grid.RowSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="50"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="16"/>
+                <RowDefinition/>
+                <RowDefinition Height="200"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" BorderBrush="Red" BorderThickness="1" Panel.ZIndex="1"/>
+            <Border Grid.Column="0" Grid.Row="2" BorderBrush="Red" BorderThickness="1" Panel.ZIndex="1"/>
+            <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+                <TextBlock  Text="5日均线: " Foreground="DarkGray"></TextBlock>
+                <TextBlock  x:Name="text5" Text="5日均线:" Foreground="DarkGray"></TextBlock>
+                <TextBlock  Text="  10日均线: " Foreground="Yellow"></TextBlock>
+                <TextBlock  x:Name="text10" Text="5日均线:" Foreground="Yellow"></TextBlock>
+                <TextBlock  Text="  20日均线: " Foreground="Purple"></TextBlock>
+                <TextBlock  x:Name="text20" Text="5日均线:" Foreground="Purple"></TextBlock>
+                <TextBlock  Text="  60日均线: " Foreground="Blue"></TextBlock>
+                <TextBlock  x:Name="text60" Text="5日均线:" Foreground="Blue"></TextBlock>
+                <TextBlock  Text="  120日均线: " Foreground="Green"></TextBlock>
+                <TextBlock  x:Name="text120" Text="5日均线:" Foreground="Green"></TextBlock>
+            </StackPanel>
+            <Canvas x:Name="canvas" Loaded="canvas_Loaded" Background="Black" KeyDown="canvas_KeyDown" SizeChanged="canvas_Resize" Grid.Column="0" Grid.Row="1" ClipToBounds="True" Focusable="True" IsEnabled="True" MouseDown="canvas_MouseDown" MouseMove="canvas_MouseMove">
+                <Border x:Name="Status" BorderBrush="DarkGray" Height="260" BorderThickness="1" Panel.ZIndex="2" Visibility="Hidden">
+                    <StackPanel Width="87"  Background="Black" DataContext="{DynamicResource mousePanel}"  >
+                        <TextBlock TextWrapping="Wrap" Text="{Binding Date}" Foreground="Gray"/>
+                        <TextBlock TextWrapping="Wrap" Text="开盘" Foreground="Gray"/>
+                        <TextBlock TextWrapping="Wrap" Text="{Binding Open}" Foreground="{Binding OpenColor}" HorizontalAlignment="Right"/>
+                        <TextBlock TextWrapping="Wrap" Text="收盘" Foreground="Gray"/>
+                        <TextBlock TextWrapping="Wrap" Text="{Binding Close}" Foreground="{Binding CloseColor}" HorizontalAlignment="Right"/>
+                        <TextBlock TextWrapping="Wrap" Text="最高" Foreground="Gray"/>
+                        <TextBlock TextWrapping="Wrap" Text="{Binding High}" Foreground="{Binding HighColor}" HorizontalAlignment="Right"/>
+                        <TextBlock TextWrapping="Wrap" Text="最低" Foreground="Gray"/>
+                        <TextBlock TextWrapping="Wrap" Text="{Binding Low}" Foreground="{Binding LowColor}" HorizontalAlignment="Right"/>
+                        <TextBlock TextWrapping="Wrap" Text="成交量" Foreground="Gray"/>
+                        <TextBlock TextWrapping="Wrap" Text="{Binding Turnover}" Foreground="Cyan" HorizontalAlignment="Right"/>
+                        <TextBlock TextWrapping="Wrap" Text="成交额" Foreground="Gray"/>
+                        <TextBlock TextWrapping="Wrap" Text="{Binding Volume}" Foreground="Cyan" HorizontalAlignment="Right"/>
+                        <TextBlock TextWrapping="Wrap" Text="上涨" Foreground="Gray"/>
+                        <TextBlock TextWrapping="Wrap" Text="{Binding Up}" Foreground="{Binding CloseColor}" HorizontalAlignment="Right" />
+                        <TextBlock TextWrapping="Wrap" Text="涨幅" Foreground="Gray"/>
+                        <TextBlock TextWrapping="Wrap" Foreground="{Binding CloseColor}" HorizontalAlignment="Right">
+                            <TextBlock.Text>
+                                <Binding Path="UpPercent" StringFormat="{}{0:P}"/>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+            </Canvas>
+            <Canvas x:Name="canvasT" Grid.Column="0" Grid.Row="2" ClipToBounds="True" Focusable="True" IsEnabled="True" Background="Black" KeyDown="canvas_KeyDown" MouseDown="canvas_MouseDown"/>
+        </Grid>
         <StackPanel Grid.Column="2" Grid.RowSpan="2" DataContext="{DynamicResource rightPanel}">
             <TextBlock TextWrapping="Wrap" Text="{Binding Code}" Foreground="Cyan" Height="20" Margin="3,3,0,0"/>
             <TextBlock TextWrapping="Wrap" Text="开盘" Foreground="White" Margin="5,0,0,0"/>
