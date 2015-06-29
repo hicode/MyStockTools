@@ -50,7 +50,7 @@
                 <TextBlock  x:Name="text120" Text="5日均线:" Foreground="Green"></TextBlock>
             </StackPanel>
             <Canvas Grid.Column="1" Grid.RowSpan="3">
-                <TextBlock x:Name="scale1" Text="hahah" Foreground="DarkGray" Margin="0,8" Canvas.Top="{Binding ElementName=canvas, Path=0}"/>
+                <TextBlock x:Name="scale1" Text="hahah" Foreground="DarkGray" Margin="0,8" Canvas.Top="0"/>
                 <TextBlock x:Name="scale2" Text="hahah" Foreground="DarkGray" Margin="0,8" Canvas.Top="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource con1}}"/>
                 <TextBlock x:Name="scale3" Text="hahah" Foreground="DarkGray" Margin="0,8" Canvas.Top="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource con2}}"/>
                 <TextBlock x:Name="scale4" Text="hahah" Foreground="DarkGray" Margin="0,8" Canvas.Top="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource con3}}"/>
