@@ -7,11 +7,11 @@ using System.Windows.Data;
 
 namespace AnalyzePastData
 {
-    class DataConverter1 : IValueConverter
+    class DataConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            return ((double)value) / 4;
+            return ((double)value) * System.Convert.ToDouble(parameter);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
@@ -20,29 +20,4 @@ namespace AnalyzePastData
         }
     }
 
-    class DataConverter2 : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return ((double)value) * 2 / 4;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return null;
-        }
-    }
-
-    class DataConverter3 : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return ((double)value) * 3 / 4;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return null;
-        }
-    }
 }
