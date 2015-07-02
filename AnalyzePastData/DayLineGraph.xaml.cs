@@ -41,6 +41,12 @@ namespace AnalyzePastData
         private List<float> average120;
         private Path path5, path10, path20, path60, path120;
 
+        private ObservableCollection<StockListData> list = new ObservableCollection<StockListData>();
+        private bool upPercent = false;
+        private bool up = false;
+        private bool newPrice = false;
+        private bool code = false;
+
         public DayLineGraph()
         {
             uint startDate = Utilities.DateToUint(2007, 10, 1);
@@ -53,7 +59,7 @@ namespace AnalyzePastData
             InitializeComponent();
             numOfPreControl = canvas.Children.Count;
             AddList();
-            stock = stocks[stockList.SelectedIndex];
+            stock = stocks[0];
             AddGraph();
             GetAverageList();
             canvas.Focus();
@@ -71,12 +77,12 @@ namespace AnalyzePastData
 
         private void AddList()
         {
-            var list = new ObservableCollection<StockListData>();
             for (int i = 0; i < stocks.Count; i++)
             {
                 int n = stocks[i].DayLines.Count;
                 if (n <= 1) continue;
                 StockListData item = new StockListData();
+                item.ID = i;
                 item.Close = stocks[i].DayLines[n - 1].Close;
                 item.Code = stocks[i].Code;
                 item.Name = stocks[i].Name;
@@ -110,7 +116,7 @@ namespace AnalyzePastData
                 Rectangle rect1 = canvas.Children[i * 2 + 1 + numOfPreControl] as Rectangle;
                 double height = stock.DayLines[i].Open - stock.DayLines[i].Close;
                 Brush brush = height <= 0 ? Brushes.Red : Brushes.Cyan;
-                if (Math.Abs(height) < 0.0001) brush = stock.DayLines[i].Close >= stock.DayLines[i - 1].Close ? Brushes.Red : Brushes.Cyan;
+                if (i > 0 && Math.Abs(height) < 0.0001) brush = stock.DayLines[i].Close >= stock.DayLines[i - 1].Close ? Brushes.Red : Brushes.Cyan;
                 rect1.Stroke = brush;
                 if (height > 0) rect1.Fill = brush;
                 else rect1.Fill = Brushes.Black;
@@ -350,7 +356,7 @@ namespace AnalyzePastData
             if (canvas.Children.Count < max) return;
 
             RemoveAverage();
-            stock = stocks[stockList.SelectedIndex];
+            stock = stocks[(stockList.SelectedItem as StockListData).ID];
             SetUnits();
             ChangeStock();
             GetAverageList();
@@ -433,6 +439,47 @@ namespace AnalyzePastData
                 sum -= stock.DayLines[j++].Close;
             }
             return list;
+        }
+
+        private void tbUpPercent_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            IEnumerable<StockListData> newList;
+            if (upPercent) newList = list.OrderBy(item => item.UpPercent);
+            else newList = list.OrderByDescending(item => item.UpPercent);
+            upPercent = !upPercent;
+            list = new ObservableCollection<StockListData>(newList);
+            stockList.ItemsSource = list;
+        }
+
+        private void tbUp_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            IEnumerable<StockListData> newList;
+            if (up) newList = list.OrderBy(item => item.Up);
+            else newList = list.OrderByDescending(item => item.Up);
+            up = !up;
+            list = new ObservableCollection<StockListData>(newList);
+            stockList.ItemsSource = list;
+        }
+
+        private void tbNew_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            IEnumerable<StockListData> newList;
+            if (newPrice) newList = list.OrderBy(item => item.Close);
+            else newList = list.OrderByDescending(item => item.Close);
+            newPrice = !newPrice;
+            list = new ObservableCollection<StockListData>(newList);
+            stockList.ItemsSource = list;
+        }
+
+        private void tbCode_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            IEnumerable<StockListData> newList;
+            if (code) newList = list.OrderBy(item => int.Parse(item.Code));
+            else newList = list.OrderByDescending(item => int.Parse(item.Code));
+            code = !code;
+            list = new ObservableCollection<StockListData>(newList);
+            stockList.ItemsSource = list;
+
         }
     }
 }

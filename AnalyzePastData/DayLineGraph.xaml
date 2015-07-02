@@ -21,7 +21,7 @@
                         <Binding Path="Up" StringFormat="#0.00"/>
                     </TextBlock.Text>
                 </TextBlock>
-                <TextBlock Foreground="{Binding BrushClose}" Width="50" TextAlignment="Right">
+                <TextBlock Foreground="{Binding BrushClose}" Width="55" TextAlignment="Right">
                     <TextBlock.Text>
                         <Binding Path="UpPercent" StringFormat="{}{0:P}"/>
                     </TextBlock.Text>
@@ -47,11 +47,11 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="代码" TextAlignment="Center" Width="50" Foreground="Cyan"/>
+                <TextBlock x:Name="tbCode" Text="代码" TextAlignment="Center" Width="50" Foreground="Cyan" MouseDown="tbCode_MouseDown"/>
                 <TextBlock Text="名称" TextAlignment="Center" Width="55" Foreground="Cyan"/>
-                <TextBlock Text="最新" TextAlignment="Right" Width="50" Foreground="Cyan"/>
-                <TextBlock Text="上涨" TextAlignment="Right" Width="40" Foreground="Cyan"/>
-                <TextBlock Text="涨幅" TextAlignment="Right" Width="50" Foreground="Cyan"/>
+                <TextBlock x:Name="tbNew" Text="最新" TextAlignment="Right" Width="50" Foreground="Cyan" MouseDown="tbNew_MouseDown"/>
+                <TextBlock x:Name="tbUp" Text="上涨" TextAlignment="Right" Width="40" Foreground="Cyan" MouseDown="tbUp_MouseDown"/>
+                <TextBlock x:Name="tbUpPercent" Text="涨幅" TextAlignment="Right" Width="50" Foreground="Cyan" MouseDown="tbUpPercent_MouseDown"/>
             </StackPanel>
             <ListBox x:Name="stockList" Grid.Row="1" Background="Black" SelectionMode="Single" SelectedIndex="0"
                  SelectionChanged="stockList_SelectionChanged" GotFocus="stockList_GotFocus" ItemTemplate="{StaticResource listItem}">

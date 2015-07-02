@@ -9,6 +9,7 @@ namespace AnalyzePastData
 {
     class StockListData
     {
+        public int ID { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
         public float Close { get; set; }
