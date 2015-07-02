@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -70,10 +71,23 @@ namespace AnalyzePastData
 
         private void AddList()
         {
+            var list = new ObservableCollection<StockListData>();
             for (int i = 0; i < stocks.Count; i++)
             {
-                stockList.Items.Add(stocks[i].Code + " " + stocks[i].Name);
+                int n = stocks[i].DayLines.Count;
+                if (n <= 1) continue;
+                StockListData item = new StockListData();
+                item.Close = stocks[i].DayLines[n - 1].Close;
+                item.Code = stocks[i].Code;
+                item.Name = stocks[i].Name;
+                item.Up = stocks[i].DayLines[n - 1].Close - stocks[i].DayLines[n - 2].Close;
+                item.UpPercent = item.Up / stocks[i].DayLines[n - 2].Close;
+                if (item.Up > 0) item.BrushClose = Brushes.Red;
+                else if (item.Up < 0) item.BrushClose = Brushes.LightGreen;
+                else item.BrushClose = Brushes.White;
+                list.Add(item);
             }
+            stockList.ItemsSource = list;
         }
 
         private void AddGraph()

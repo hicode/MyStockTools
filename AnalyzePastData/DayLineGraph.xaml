@@ -7,10 +7,31 @@
         <local:DataToShow x:Key="rightPanel"/>
         <local:DataToShow x:Key="mousePanel"/>
         <local:DataConverter x:Key="convert"/>
+        <DataTemplate x:Key="listItem" DataType="{x:Type local:StockListData}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Foreground="Cyan" Text="{Binding Code}" Width="50"/>
+                <TextBlock Foreground="Yellow" Text="{Binding Name}" Width="55"/>
+                <TextBlock Foreground="{Binding BrushClose}" Width="45" TextAlignment="Right" >
+                    <TextBlock.Text>
+                        <Binding Path="Close" StringFormat="#0.00"/>
+                    </TextBlock.Text>
+                </TextBlock>
+                <TextBlock Foreground="{Binding BrushClose}" Width="40" TextAlignment="Right">
+                    <TextBlock.Text>
+                        <Binding Path="Up" StringFormat="#0.00"/>
+                    </TextBlock.Text>
+                </TextBlock>
+                <TextBlock Foreground="{Binding BrushClose}" Width="50" TextAlignment="Right">
+                    <TextBlock.Text>
+                        <Binding Path="UpPercent" StringFormat="{}{0:P}"/>
+                    </TextBlock.Text>
+                </TextBlock>
+            </StackPanel>
+        </DataTemplate>
     </Window.Resources>
     <Grid >
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="280"/>
             <ColumnDefinition/>
             <ColumnDefinition Width="50"/>
             <ColumnDefinition Width="75"/>
@@ -20,9 +41,22 @@
             <RowDefinition Height="200"/>
         </Grid.RowDefinitions>
 
-        <ListBox x:Name="stockList" Grid.Column="0" Grid.RowSpan="2" Background="Black" Foreground="Yellow" SelectionMode="Single" SelectedIndex="0" SelectionChanged="stockList_SelectionChanged" GotFocus="stockList_GotFocus">
-
-        </ListBox>
+        <Grid Grid.Column="0" Grid.RowSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="代码" TextAlignment="Center" Width="50" Foreground="Cyan"/>
+                <TextBlock Text="名称" TextAlignment="Center" Width="55" Foreground="Cyan"/>
+                <TextBlock Text="最新" TextAlignment="Right" Width="50" Foreground="Cyan"/>
+                <TextBlock Text="上涨" TextAlignment="Right" Width="40" Foreground="Cyan"/>
+                <TextBlock Text="涨幅" TextAlignment="Right" Width="50" Foreground="Cyan"/>
+            </StackPanel>
+            <ListBox x:Name="stockList" Grid.Row="1" Background="Black" SelectionMode="Single" SelectedIndex="0"
+                 SelectionChanged="stockList_SelectionChanged" GotFocus="stockList_GotFocus" ItemTemplate="{StaticResource listItem}">
+            </ListBox>
+        </Grid>
         <Grid Grid.Column="1" Grid.RowSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -49,15 +83,25 @@
             </StackPanel>
             <Canvas Grid.Column="1" Grid.RowSpan="3">
                 <TextBlock x:Name="scale1" Text="hahah" Foreground="DarkGray" Margin="0,8" Canvas.Top="0"/>
-                <TextBlock x:Name="scale2" Text="hahah" Foreground="DarkGray" Margin="0,8" Canvas.Top="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.25}"/>
-                <TextBlock x:Name="scale3" Text="hahah" Foreground="DarkGray" Margin="0,8" Canvas.Top="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.5}"/>
-                <TextBlock x:Name="scale4" Text="hahah" Foreground="DarkGray" Margin="0,8" Canvas.Top="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.75}"/>
+                <TextBlock x:Name="scale2" Text="hahah" Foreground="DarkGray" Margin="0,8" 
+                           Canvas.Top="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.25}"/>
+                <TextBlock x:Name="scale3" Text="hahah" Foreground="DarkGray" Margin="0,8" 
+                           Canvas.Top="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.5}"/>
+                <TextBlock x:Name="scale4" Text="hahah" Foreground="DarkGray" Margin="0,8" 
+                           Canvas.Top="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.75}"/>
                 <TextBlock x:Name="scale5" Text="hahah" Foreground="DarkGray" Margin="0,8" Canvas.Top="{Binding ElementName=canvas, Path=ActualHeight}"/>
             </Canvas>
-            <Canvas x:Name="canvas" Loaded="canvas_Loaded" Background="Black" KeyDown="canvas_KeyDown" SizeChanged="canvas_Resize" Grid.Column="0" Grid.Row="1" ClipToBounds="True" Focusable="True" IsEnabled="True" MouseDown="canvas_MouseDown" MouseMove="canvas_MouseMove">
-                <Line SnapsToDevicePixels="True" X1="0" Y1="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.25}" X2="{Binding ElementName=canvas, Path=ActualWidth}" Y2="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.25}" Stroke="DarkGray" StrokeThickness="1" StrokeDashArray="2,4"/>
-                <Line SnapsToDevicePixels="True" X1="0" Y1="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.5}" X2="{Binding ElementName=canvas, Path=ActualWidth}" Y2="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.5}" Stroke="DarkGray" StrokeThickness="1" StrokeDashArray="2,4"/>
-                <Line SnapsToDevicePixels="True" X1="0" Y1="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.75}" X2="{Binding ElementName=canvas, Path=ActualWidth}" Y2="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.75}" Stroke="DarkGray" StrokeThickness="1" StrokeDashArray="2,4"/>
+            <Canvas x:Name="canvas" Loaded="canvas_Loaded" Background="Black" KeyDown="canvas_KeyDown" SizeChanged="canvas_Resize" 
+                    Grid.Column="0" Grid.Row="1" ClipToBounds="True" Focusable="True" IsEnabled="True" MouseDown="canvas_MouseDown" MouseMove="canvas_MouseMove">
+                <Line SnapsToDevicePixels="True" X1="0" Y1="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.25}" 
+                      X2="{Binding ElementName=canvas, Path=ActualWidth}" Y2="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.25}" 
+                      Stroke="DarkGray" StrokeThickness="0.5" StrokeDashArray="2,4"/>
+                <Line SnapsToDevicePixels="True" X1="0" Y1="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.5}" 
+                      X2="{Binding ElementName=canvas, Path=ActualWidth}" Y2="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.5}" 
+                      Stroke="DarkGray" StrokeThickness="0.5" StrokeDashArray="2,4"/>
+                <Line SnapsToDevicePixels="True" X1="0" Y1="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.75}" 
+                      X2="{Binding ElementName=canvas, Path=ActualWidth}" Y2="{Binding ElementName=canvas, Path=ActualHeight, Converter={StaticResource convert}, ConverterParameter=0.75}" 
+                      Stroke="DarkGray" StrokeThickness="0.5" StrokeDashArray="2,4"/>
                 <Border x:Name="Status" BorderBrush="DarkGray" Height="260" BorderThickness="1" Panel.ZIndex="2" Visibility="Hidden">
                     <StackPanel Width="87"  Background="Black" DataContext="{DynamicResource mousePanel}"  >
                         <TextBlock TextWrapping="Wrap" Text="{Binding Date}" Foreground="Gray"/>
@@ -84,7 +128,8 @@
                     </StackPanel>
                 </Border>
             </Canvas>
-            <Canvas x:Name="canvasT" Grid.Column="0" Grid.Row="2" ClipToBounds="True" Focusable="True" IsEnabled="True" Background="Black" KeyDown="canvas_KeyDown" MouseDown="canvas_MouseDown"/>
+            <Canvas x:Name="canvasT" Grid.Column="0" Grid.Row="2" ClipToBounds="True" Focusable="True" IsEnabled="True" 
+                    Background="Black" KeyDown="canvas_KeyDown" MouseDown="canvas_MouseDown"/>
         </Grid>
         <StackPanel Grid.Column="2" Grid.RowSpan="2" DataContext="{DynamicResource rightPanel}">
             <TextBlock TextWrapping="Wrap" Text="{Binding Code}" Foreground="Cyan" Height="20" Margin="3,3,0,0"/>
