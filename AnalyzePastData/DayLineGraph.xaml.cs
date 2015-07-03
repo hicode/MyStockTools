@@ -470,5 +470,19 @@ namespace AnalyzePastData
             list = new ObservableCollection<StockListData>(newList);
             stockList.ItemsSource = list;
         }
+
+        private void tbSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter) return;
+            string input = tbSearch.Text;
+            foreach (var item in stockList.ItemsSource)
+            {
+                if ((item as StockListData).Code != input) continue;
+                stockList.SelectedItem = item;
+                stockList.ScrollIntoView(item);
+                break;
+            }
+            tbSearch.Text = "";
+        }
     }
 }

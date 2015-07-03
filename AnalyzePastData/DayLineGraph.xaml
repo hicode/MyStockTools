@@ -142,7 +142,7 @@
             <TextBlock TextWrapping="Wrap" Text="成交量" Foreground="White" Margin="5,0,0,0"/>
             <TextBlock TextWrapping="Wrap" Text="成交额" Foreground="White" Margin="5,0,0,0"/>
         </StackPanel>
-        <StackPanel Grid.Column="3" Grid.RowSpan="2" DataContext="{DynamicResource rightPanel}">
+        <StackPanel Grid.Column="3" Grid.Row="0" DataContext="{DynamicResource rightPanel}">
             <TextBlock TextWrapping="Wrap" Text="{Binding Name}" Foreground="Yellow" Height="20" Margin="3,3,0,0"/>
             <TextBlock TextWrapping="Wrap" Text="{Binding Open}" Foreground="{Binding OpenColor}" Margin="3,0,0,0" HorizontalAlignment="Right"/>
             <TextBlock TextWrapping="Wrap" Text="{Binding Close}" Foreground="{Binding CloseColor}" Margin="3,0,0,0" HorizontalAlignment="Right"/>
@@ -157,5 +157,6 @@
             <TextBlock TextWrapping="Wrap" Text="{Binding Turnover}" Foreground="Cyan" Margin="3,0,0,0" HorizontalAlignment="Right"/>
             <TextBlock TextWrapping="Wrap" Text="{Binding Volume}" Foreground="Cyan" Margin="3,0,0,0" HorizontalAlignment="Right"/>
         </StackPanel>
+        <TextBox x:Name="tbSearch" Grid.Column="3" Grid.Row="1" Height="20" VerticalAlignment="Bottom" Background="#FF232723" KeyDown="tbSearch_KeyDown" Foreground="#FFE2E228"/>
     </Grid>
 </Window>
