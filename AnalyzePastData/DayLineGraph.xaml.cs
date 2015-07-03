@@ -443,43 +443,32 @@ namespace AnalyzePastData
 
         private void tbUpPercent_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            IEnumerable<StockListData> newList;
-            if (upPercent) newList = list.OrderBy(item => item.UpPercent);
-            else newList = list.OrderByDescending(item => item.UpPercent);
-            upPercent = !upPercent;
-            list = new ObservableCollection<StockListData>(newList);
-            stockList.ItemsSource = list;
+            SortStockList(ref upPercent, item => item.UpPercent);
         }
 
         private void tbUp_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            IEnumerable<StockListData> newList;
-            if (up) newList = list.OrderBy(item => item.Up);
-            else newList = list.OrderByDescending(item => item.Up);
-            up = !up;
-            list = new ObservableCollection<StockListData>(newList);
-            stockList.ItemsSource = list;
+            SortStockList(ref up, item => item.Up);
         }
 
         private void tbNew_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            IEnumerable<StockListData> newList;
-            if (newPrice) newList = list.OrderBy(item => item.Close);
-            else newList = list.OrderByDescending(item => item.Close);
-            newPrice = !newPrice;
-            list = new ObservableCollection<StockListData>(newList);
-            stockList.ItemsSource = list;
+            SortStockList(ref newPrice, item => item.Close);
         }
 
         private void tbCode_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            SortStockList(ref code, item => float.Parse(item.Code));
+        }
+
+        private void SortStockList( ref bool upDown, Func<StockListData, float> keySelector)
+        {
             IEnumerable<StockListData> newList;
-            if (code) newList = list.OrderBy(item => int.Parse(item.Code));
-            else newList = list.OrderByDescending(item => int.Parse(item.Code));
-            code = !code;
+            if (upDown) newList = list.OrderBy(keySelector);
+            else newList = list.OrderByDescending(keySelector);
+            upDown = !upDown;
             list = new ObservableCollection<StockListData>(newList);
             stockList.ItemsSource = list;
-
         }
     }
 }
