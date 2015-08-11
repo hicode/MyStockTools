@@ -42,6 +42,7 @@ namespace AnalyzePastData
         private Path path5, path10, path20, path60, path120;
 
         private ObservableCollection<StockListData> list = new ObservableCollection<StockListData>();
+        private ObservableCollection<string> searchList = new ObservableCollection<string>();
         private bool upPercent = false;
         private bool up = false;
         private bool newPrice = false;
@@ -92,8 +93,11 @@ namespace AnalyzePastData
                 else if (item.Up < 0) item.BrushClose = Brushes.LightGreen;
                 else item.BrushClose = Brushes.White;
                 list.Add(item);
+                string searchItem = stocks[i].Code + " " + stocks[i].Name;
+                searchList.Add(searchItem);
             }
             stockList.ItemsSource = list;
+            listSearch.ItemsSource = searchList;
         }
 
         private void AddGraph()
@@ -446,6 +450,15 @@ namespace AnalyzePastData
             SortStockList(ref upPercent, item => item.UpPercent);
         }
 
+        private void tbSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string input = tbSearch.Text;
+            if (input == "") { listSearch.Visibility = Visibility.Collapsed; return; }
+            var view = CollectionViewSource.GetDefaultView(listSearch.ItemsSource);
+            view.Filter = str => (str as string).StartsWith(input);
+            listSearch.Visibility = Visibility.Visible;
+        }
+
         private void tbUp_MouseDown(object sender, MouseButtonEventArgs e)
         {
             SortStockList(ref up, item => item.Up);
@@ -473,8 +486,8 @@ namespace AnalyzePastData
 
         private void tbSearch_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key != Key.Enter) return;
             string input = tbSearch.Text;
+            if (e.Key != Key.Enter) return;
             foreach (var item in stockList.ItemsSource)
             {
                 if ((item as StockListData).Code != input) continue;

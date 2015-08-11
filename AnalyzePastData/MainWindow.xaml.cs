@@ -35,7 +35,9 @@ namespace AnalyzePastData
             //uint endDate = AnalyzeStocks.DateToUint(2015, 6, 9);
             //AnalyzeStocks analyze = new AnalyzeStocks(startDate, endDate);
             //analyze.StartAnalyze();
+            this.Cursor = Cursors.Wait;
             var kLineGraph = new DayLineGraph();
+            this.Cursor = null;
             kLineGraph.Show();
         }
 

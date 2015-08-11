@@ -131,7 +131,7 @@
             <Canvas x:Name="canvasT" Grid.Column="0" Grid.Row="2" ClipToBounds="True" Focusable="True" IsEnabled="True" 
                     Background="Black" KeyDown="canvas_KeyDown" MouseDown="canvas_MouseDown"/>
         </Grid>
-        <StackPanel Grid.Column="2" Grid.RowSpan="2" DataContext="{DynamicResource rightPanel}">
+        <StackPanel Grid.Column="2" Grid.Row="0" DataContext="{DynamicResource rightPanel}">
             <TextBlock TextWrapping="Wrap" Text="{Binding Code}" Foreground="Cyan" Height="20" Margin="3,3,0,0"/>
             <TextBlock TextWrapping="Wrap" Text="开盘" Foreground="White" Margin="5,0,0,0"/>
             <TextBlock TextWrapping="Wrap" Text="收盘" Foreground="White" Margin="5,0,0,0"/>
@@ -157,6 +157,11 @@
             <TextBlock TextWrapping="Wrap" Text="{Binding Turnover}" Foreground="Cyan" Margin="3,0,0,0" HorizontalAlignment="Right"/>
             <TextBlock TextWrapping="Wrap" Text="{Binding Volume}" Foreground="Cyan" Margin="3,0,0,0" HorizontalAlignment="Right"/>
         </StackPanel>
-        <TextBox x:Name="tbSearch" Grid.Column="3" Grid.Row="1" Height="20" VerticalAlignment="Bottom" Background="#FF232723" KeyDown="tbSearch_KeyDown" Foreground="#FFE2E228"/>
+        <StackPanel Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="1" VerticalAlignment="Bottom">
+            <ListBox x:Name="listSearch" Background="Black" Foreground="White" Visibility="Collapsed">
+                
+            </ListBox>
+            <TextBox x:Name="tbSearch" Grid.Column="2"  Height="20"  Background="#FF232723" KeyDown="tbSearch_KeyDown" Foreground="#FFE2E228" TextChanged="tbSearch_TextChanged"/>
+        </StackPanel>
     </Grid>
 </Window>
