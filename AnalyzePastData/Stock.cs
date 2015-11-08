@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace AnalyzePastData
 {
+    /// <summary>
+    /// 
+    /// </summary>
     struct DayLine
     {
         public uint Date;
@@ -28,6 +31,9 @@ namespace AnalyzePastData
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     class Stock : IComparable<Stock>
     {
         public string Code { get; private set; }

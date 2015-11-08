@@ -28,7 +28,11 @@ namespace AnalyzePastData
             InitializeComponent();
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             //uint startDate = AnalyzeStocks.DateToUint(2007, 10, 1);
@@ -42,7 +46,10 @@ namespace AnalyzePastData
         }
 
 
-
+        /// <summary>
+        /// Write stocks to 东方财富的自选股9
+        /// </summary>
+        /// <param name="stocks"></param>
         private void WriteStocksToSelfblock(IEnumerable<Stock> stocks)
         {
             StringBuilder newStr = new StringBuilder();
@@ -75,6 +82,10 @@ namespace AnalyzePastData
             after.Close();
         }
 
+        /// <summary>
+        /// parse all the stock files from 通信达 to a single file.
+        /// create a file contains stock code and name table.
+        /// </summary>
         private void ParseHistoryFilesToOneFile()
         {
             BufferedStream target = new BufferedStream(new FileStream(@"G:\StockData\history.txt", FileMode.Create, FileAccess.Write));

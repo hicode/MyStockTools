@@ -21,19 +21,29 @@ namespace AnalyzePastData
     public partial class DayLineGraph : Window
     {
         private List<Stock> stocks;
+        // the count of canvas.Children right after initialization of DayLineGraph's component 
         private int numOfPreControl;
-        private int num = 150;
+        // number of DayLines showed 
+        private int num = 120;
+        // the number of days from original posision
         private int offset = 0;
+        // the highest and the lowest value of the DayLines in the canvas
         private float highest, lowest;
+        // the max of the turnovers in the canvas
         private uint maxTurnover;
+        // the width of a single DayLine
         private double width;
+        // the stock currently showed
         private Stock stock;
+        // max of the number of DayLines among all the stocks
         private int max;
         private bool mouseOn = false;
         private bool keyOn = false;
+        // the line showed to choose a day
         private Rectangle singleLine = new Rectangle() { Stroke = Brushes.DarkGray, Width = 1, Height = 1200, SnapsToDevicePixels = true };
         private Rectangle singleLine1 = new Rectangle() { Stroke = Brushes.DarkGray, Width = 1, Height = 1200, SnapsToDevicePixels = true };
 
+        // average line's data and path
         private List<float> average5;
         private List<float> average10;
         private List<float> average20;
@@ -41,13 +51,19 @@ namespace AnalyzePastData
         private List<float> average120;
         private Path path5, path10, path20, path60, path120;
 
+        // stock list on the left
         private ObservableCollection<StockListData> list = new ObservableCollection<StockListData>();
+        // search list on the right bottom
         private ObservableCollection<string> searchList = new ObservableCollection<string>();
+        // sort direction
         private bool upPercent = false;
         private bool up = false;
         private bool newPrice = false;
         private bool code = false;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public DayLineGraph()
         {
             uint startDate = Utilities.DateToUint(2007, 10, 1);
