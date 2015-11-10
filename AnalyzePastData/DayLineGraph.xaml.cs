@@ -66,8 +66,9 @@ namespace AnalyzePastData
         /// </summary>
         public DayLineGraph()
         {
-            uint startDate = Utilities.DateToUint(2007, 10, 1);
-            uint endDate = Utilities.DateToUint(2015, 6, 9);
+            uint startDate = Utilities.DateToUint(2009, 1, 1);
+            DateTime today = DateTime.Now;
+            uint endDate = Utilities.DateToUint(today.Year, today.Month, today.Day);
             stocks = Utilities.getStocks(startDate, endDate);
             for (int i = 0; i < stocks.Count; i++)
             {
