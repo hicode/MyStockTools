@@ -11,7 +11,7 @@ namespace AnalyzePastData
 {
     static class Utilities
     {
-        public static bool dateLargerThan(uint date1, uint date2)
+        public static bool DateLargerThan(uint date1, uint date2)
         {
             if ((date1 & 0x0000FFFF) > (date2 & 0x0000FFFF)) return true;
             if ((date1 & 0x0000FFFF) < (date2 & 0x0000FFFF)) return false;
@@ -73,7 +73,7 @@ namespace AnalyzePastData
                         uint turnover = br.ReadUInt32();
                         double volume = br.ReadDouble();
                         if (turnover == 0) continue;
-                        if (dateLargerThan(date, endDate) || dateLargerThan(startDate, date)) continue;
+                        if (DateLargerThan(date, endDate) || DateLargerThan(startDate, date)) continue;
                         stock.DayLines.Add(new DayLine(date, open, close, high, low, turnover, volume));
                     }
                     list.Add(stock);

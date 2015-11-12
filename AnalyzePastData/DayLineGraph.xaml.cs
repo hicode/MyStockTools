@@ -21,11 +21,13 @@ namespace AnalyzePastData
     public partial class DayLineGraph : Window
     {
         private List<Stock> stocks;
+        // latest day of the data
+        private uint latestDay = 0;
         // the count of canvas.Children right after initialization of DayLineGraph's component 
         private int numOfPreControl;
         // number of DayLines showed 
         private int num = 120;
-        // the number of days from original posision
+        // the number of days from original position
         private int offset = 0;
         // the highest and the lowest value of the DayLines in the canvas
         private float highest, lowest;
@@ -70,9 +72,12 @@ namespace AnalyzePastData
             DateTime today = DateTime.Now;
             uint endDate = Utilities.DateToUint(today.Year, today.Month, today.Day);
             stocks = Utilities.getStocks(startDate, endDate);
+
             for (int i = 0; i < stocks.Count; i++)
             {
                 max = Math.Max(max, stocks[i].DayLines.Count);
+                var date = stocks[i].DayLines[stocks[i].DayLines.Count - 1].Date;
+                latestDay = Utilities.DateLargerThan(date, latestDay) ? date : latestDay;
             }
             InitializeComponent();
             numOfPreControl = canvas.Children.Count;
@@ -104,11 +109,20 @@ namespace AnalyzePastData
                 item.Close = stocks[i].DayLines[n - 1].Close;
                 item.Code = stocks[i].Code;
                 item.Name = stocks[i].Name;
-                item.Up = stocks[i].DayLines[n - 1].Close - stocks[i].DayLines[n - 2].Close;
-                item.UpPercent = item.Up / stocks[i].DayLines[n - 2].Close;
-                if (item.Up > 0) item.BrushClose = Brushes.Red;
-                else if (item.Up < 0) item.BrushClose = Brushes.LightGreen;
-                else item.BrushClose = Brushes.White;
+                if (Utilities.DateLargerThan(latestDay, stocks[i].DayLines[n - 1].Date))
+                {
+                    item.Up = float.NaN;
+                    item.UpPercent = float.NaN;
+                    item.BrushClose = Brushes.DarkBlue;
+                }
+                else
+                {
+                    item.Up = stocks[i].DayLines[n - 1].Close - stocks[i].DayLines[n - 2].Close;
+                    item.UpPercent = item.Up / stocks[i].DayLines[n - 2].Close;
+                    if (item.Up > 0) item.BrushClose = Brushes.Red;
+                    else if (item.Up < 0) item.BrushClose = Brushes.LightGreen;
+                    else item.BrushClose = Brushes.White;
+                }
                 list.Add(item);
                 string searchItem = stocks[i].Code + " " + stocks[i].Name;
                 searchList.Add(searchItem);
@@ -491,7 +505,7 @@ namespace AnalyzePastData
             SortStockList(ref code, item => float.Parse(item.Code));
         }
 
-        private void SortStockList( ref bool upDown, Func<StockListData, float> keySelector)
+        private void SortStockList(ref bool upDown, Func<StockListData, float> keySelector)
         {
             IEnumerable<StockListData> newList;
             if (upDown) newList = list.OrderBy(keySelector);

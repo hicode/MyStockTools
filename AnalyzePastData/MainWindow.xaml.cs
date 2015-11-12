@@ -41,9 +41,9 @@ namespace AnalyzePastData
             //analyze.StartAnalyze();
 
 
-            this.Cursor = Cursors.Wait;
+            Cursor = Cursors.Wait;
             var kLineGraph = new DayLineGraph();
-            this.Cursor = null;
+            Cursor = null;
             kLineGraph.Show();
 
 
@@ -53,7 +53,9 @@ namespace AnalyzePastData
 
         private void btnRestoreData_Click(object sender, RoutedEventArgs e)
         {
+            Cursor = Cursors.Wait;
             Utilities.ParseHistoryFilesToOneFile();
+            Cursor = null;
             MessageBox.Show("done");
 
         }
