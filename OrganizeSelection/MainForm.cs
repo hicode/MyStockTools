@@ -18,25 +18,25 @@ namespace OrganizeSelection
             InitializeComponent();
         }
 
-        private void btnMove_Click(object sender, EventArgs e)
-        {
-            if (MessageBox.Show("你确定要移动自选股吗？", "确认", MessageBoxButtons.OKCancel) == DialogResult.Cancel) return;
-            string path = @"D:\dzh2\USERDATA\block\自选股";
-            File.Delete(path + "2.BLK");
-            for (int i = 2; i < 8; i++)
-            {
-                string file1 = path + i + ".BLK";
-                string file2 = path + (i + 1) + ".BLK";
-                File.Move(file2, file1);
-            }
-            FileStream file8 = new FileStream(path + "8.BLK", FileMode.Create, FileAccess.ReadWrite);
-            BinaryWriter bw = new BinaryWriter(file8);
-            byte[] head = { 0xa6, 0x20, 0x51, 0xff, 0x01 };
-            bw.Write(head);
-            bw.Close();
-            file8.Close();
-            MessageBox.Show("自选股移动完成！");
-        }
+        //private void btnMove_Click(object sender, EventArgs e)
+        //{
+        //    if (MessageBox.Show("你确定要移动自选股吗？", "确认", MessageBoxButtons.OKCancel) == DialogResult.Cancel) return;
+        //    string path = @"D:\dzh2\USERDATA\block\自选股";
+        //    File.Delete(path + "2.BLK");
+        //    for (int i = 2; i < 8; i++)
+        //    {
+        //        string file1 = path + i + ".BLK";
+        //        string file2 = path + (i + 1) + ".BLK";
+        //        File.Move(file2, file1);
+        //    }
+        //    FileStream file8 = new FileStream(path + "8.BLK", FileMode.Create, FileAccess.ReadWrite);
+        //    BinaryWriter bw = new BinaryWriter(file8);
+        //    byte[] head = { 0xa6, 0x20, 0x51, 0xff, 0x01 };
+        //    bw.Write(head);
+        //    bw.Close();
+        //    file8.Close();
+        //    MessageBox.Show("自选股移动完成！");
+        //}
 
         private void btnUnion_Click(object sender, EventArgs e)
         {
@@ -99,7 +99,21 @@ namespace OrganizeSelection
             }
             targetWriter.Close();
             selectedStocks.Close();
-            MessageBox.Show("合并完成！");
+
+            File.Delete(path + "2.BLK");
+            for (int i = 2; i < 8; i++)
+            {
+                string file1 = path + i + ".BLK";
+                string file2 = path + (i + 1) + ".BLK";
+                File.Move(file2, file1);
+            }
+            FileStream file8 = new FileStream(path + "8.BLK", FileMode.Create, FileAccess.ReadWrite);
+            BinaryWriter bw = new BinaryWriter(file8);
+            byte[] head1 = { 0xa6, 0x20, 0x51, 0xff, 0x01 };
+            bw.Write(head1);
+            bw.Close();
+            file8.Close();
+            MessageBox.Show("涨停股整理完成！");
         }
     }
 }
