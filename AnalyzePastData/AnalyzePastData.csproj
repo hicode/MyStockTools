@@ -69,6 +69,7 @@
     </Compile>
     <Compile Include="Stock.cs" />
     <Compile Include="StockListData.cs" />
+    <Compile Include="StocksFilter.cs" />
     <Compile Include="Utilities.cs" />
     <Page Include="DayLineGraph.xaml">
       <SubType>Designer</SubType>

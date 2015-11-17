@@ -18,7 +18,7 @@ namespace AnalyzePastData
     /// <summary>
     /// Interaction logic for DayLineGraph.xaml
     /// </summary>
-    public partial class DayLineGraph : Window
+    public partial class DayLineGraph : Window, IDisposable
     {
         private List<Stock> stocks;
         // latest day of the data
@@ -527,6 +527,11 @@ namespace AnalyzePastData
                 break;
             }
             tbSearch.Text = "";
+        }
+
+        public void Dispose()
+        {
+            GC.Collect();
         }
     }
 }

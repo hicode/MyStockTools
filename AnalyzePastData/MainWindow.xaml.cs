@@ -41,13 +41,23 @@ namespace AnalyzePastData
             //analyze.StartAnalyze();
 
 
+            //Cursor = Cursors.Wait;
+            //var kLineGraph = new DayLineGraph();
+            //kLineGraph.Show();
+            //Cursor = null;
+
+
             Cursor = Cursors.Wait;
-            var kLineGraph = new DayLineGraph();
+            uint startDate = Utilities.DateToUint(2015, 10, 1);
+            uint endDate = Utilities.DateToUint(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+            var stocks = Utilities.getStocks(startDate, endDate);
+            var test = new StocksFilter(stocks);
+            test.GetUpDown(3, 1, 0.15f, 0.02f);
+            test.OutputResult();
             Cursor = null;
-            kLineGraph.Show();
+            MessageBox.Show("Done");
 
 
-            //Utilities.AddTodayToHistoryFile();
 
         }
 
