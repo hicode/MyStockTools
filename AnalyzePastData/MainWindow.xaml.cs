@@ -52,7 +52,8 @@ namespace AnalyzePastData
             uint endDate = Utilities.DateToUint(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
             var stocks = Utilities.getStocks(startDate, endDate);
             var test = new StocksFilter(stocks);
-            test.GetUpDown(3, 1, 0.15f, 0.02f);
+            test.GetUpDown(3, 2, 0.15f, 0.02f);
+            //test.GetUpDown(3, 0, 0.15f, 0f);
             test.OutputResult();
             Cursor = null;
             MessageBox.Show("Done");

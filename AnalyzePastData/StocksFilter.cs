@@ -10,12 +10,12 @@ namespace AnalyzePastData
     {
         private List<Stock> stocks;
         private uint latestDay;
-        private List<Stock> selectStocks;
+        private HashSet<Stock> selectStocks;
 
         public StocksFilter(List<Stock> stocks)
         {
             this.stocks = stocks;
-            selectStocks = new List<Stock>();
+            selectStocks = new HashSet<Stock>();
             foreach (var stock in stocks)
             {
                 if (stock.DayLines.Count == 0) continue;
