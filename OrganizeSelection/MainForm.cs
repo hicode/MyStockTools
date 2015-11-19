@@ -109,7 +109,7 @@ namespace OrganizeSelection
             }
             FileStream file8 = new FileStream(path + "8.BLK", FileMode.Create, FileAccess.ReadWrite);
             BinaryWriter bw = new BinaryWriter(file8);
-            byte[] head1 = { 0xa6, 0x20, 0x51, 0xff, 0x01 };
+            byte[] head1 = { 0xa6, 0x00, 0x51, 0xff, 0x01 };
             bw.Write(head1);
             bw.Close();
             file8.Close();

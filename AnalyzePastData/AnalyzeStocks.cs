@@ -351,7 +351,7 @@ namespace AnalyzePastData
         {
             if (index == 0 || index > stock.DayLines.Count - n) return false;
             if (n <= 1) return false;
-            if (Math.Abs(stock.DayLines[index].Open / limitUp(stock.DayLines[index - 1].Close)) < 0.001
+            if (Math.Abs(stock.DayLines[index].Open / Utilities.LimitUp(stock.DayLines[index - 1].Close)) < 0.001
                 && stock.DayLines[index].Close == stock.DayLines[index].Low) return false;
             float realPercent = stock.DayLines[index + n - 1].Close / stock.DayLines[index].Open - 1;
             return (percent > 0 && realPercent > percent) || (percent < 0 && realPercent < percent);
@@ -361,7 +361,7 @@ namespace AnalyzePastData
         {
             if (index == 0 || index > stock.DayLines.Count - n) return false;
             if (n <= 1) return false;
-            if (Math.Abs(stock.DayLines[index].Open / limitUp(stock.DayLines[index - 1].Close)) < 0.001
+            if (Math.Abs(stock.DayLines[index].Open / Utilities.LimitUp(stock.DayLines[index - 1].Close)) < 0.001
                 && stock.DayLines[index].Close == stock.DayLines[index].Low) return false;
             float realPercent = stock.DayLines[index + n - 1].Close / stock.DayLines[index].Low - 1;
             return (percent > 0 && realPercent > percent) || (percent < 0 && realPercent < percent);
@@ -379,7 +379,7 @@ namespace AnalyzePastData
         {
             if (index == 0 || index > stock.DayLines.Count - n) return false;
             if (n <= 1) return false;
-            if (Math.Abs(stock.DayLines[index].Open / limitUp(stock.DayLines[index - 1].Close)) < 0.001
+            if (Math.Abs(stock.DayLines[index].Open / Utilities.LimitUp(stock.DayLines[index - 1].Close)) < 0.001
                 && stock.DayLines[index].Close == stock.DayLines[index].Low) return false;
             float realPercent = stock.DayLines[index + n - 1].High / stock.DayLines[index].Open - 1;
             return (percent > 0 && realPercent > percent) || (percent < 0 && realPercent < percent);
@@ -389,7 +389,7 @@ namespace AnalyzePastData
         {
             if (index == 0 || index > stock.DayLines.Count - n) return false;
             if (n <= 1) return false;
-            if (Math.Abs(stock.DayLines[index].Open / limitUp(stock.DayLines[index - 1].Close)) < 0.001
+            if (Math.Abs(stock.DayLines[index].Open / Utilities.LimitUp(stock.DayLines[index - 1].Close)) < 0.001
                 && stock.DayLines[index].Close == stock.DayLines[index].Low) return false;
             float realPercent = stock.DayLines[index + n - 1].High / stock.DayLines[index].Low - 1;
             return (percent > 0 && realPercent > percent) || (percent < 0 && realPercent < percent);
@@ -404,8 +404,8 @@ namespace AnalyzePastData
                 for (int j = i; j < i + n; j++)
                 {
                     if (!includeFlat && (stock.DayLines[j].Low == stock.DayLines[j].Close
-                        || Math.Abs(stock.DayLines[j].Close - limitUp(stock.DayLines[j - 1].Close)) / stock.DayLines[j - 1].Close > 0.001)) isValid = false;
-                    if (includeFlat && Math.Abs(stock.DayLines[j].Close - limitUp(stock.DayLines[j - 1].Close)) / stock.DayLines[j - 1].Close > 0.001) isValid = false;
+                        || Math.Abs(stock.DayLines[j].Close - Utilities.LimitUp(stock.DayLines[j - 1].Close)) / stock.DayLines[j - 1].Close > 0.001)) isValid = false;
+                    if (includeFlat && Math.Abs(stock.DayLines[j].Close - Utilities.LimitUp(stock.DayLines[j - 1].Close)) / stock.DayLines[j - 1].Close > 0.001) isValid = false;
                 }
                 if (isValid) res.Add(i);
             }
@@ -422,15 +422,6 @@ namespace AnalyzePastData
         //    }
         //    return stock.DayLines.Count - 1;
         //}
-
-        private float limitUp(float price)
-        {
-            double x = price * 1.10;
-            x = x * 100 + 0.5;
-            return (float)(Math.Floor(x) / 100);
-        }
-
-
 
     }
 }

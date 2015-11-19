@@ -109,9 +109,9 @@ namespace AnalyzePastData
                 {
                     Range cell = (Range)ws.Cells[today, 1];
                     if (cell == null) break;
-                    if((string) cell.Value == stocks[old].Code)
+                    if ((string)cell.Value == stocks[old].Code)
                     {
-                        
+
                     }
                     else
                     {
@@ -188,7 +188,7 @@ namespace AnalyzePastData
         /// Write stocks to 东方财富的自选股9
         /// </summary>
         /// <param name="stocks"></param>
-        public static void WriteStocksToSelfblock(IEnumerable<Stock> stocks)
+        public static void WriteStocksToSelfblockEastmoney(IEnumerable<Stock> stocks)
         {
             StringBuilder newStr = new StringBuilder();
             string file = @"D:\eastmoney\swc8\config\User\m5604094268132944\StockwayStock.ini";
@@ -218,6 +218,88 @@ namespace AnalyzePastData
             sw.Flush();
             sw.Close();
             after.Close();
+        }
+
+        public static void WriteStocksToSelfblockDZH(IEnumerable<Stock> stocks, int blockNumber)
+        {
+            if (blockNumber < 1 || blockNumber > 8) throw new IndexOutOfRangeException("blockNumber should be between 1 and 8");
+            byte[] head1 = { 0xa6, 0x00, 0x51, 0xff, 0x01 };
+            byte[] tail = { 0x00, 0x20, 0x24, 0x01, 0x00, 0x00, 0x00, 0x00 };
+            string path = @"D:\dzh2\USERDATA\block\自选股" + blockNumber + ".BLK";
+            BinaryWriter targetWriter = new BinaryWriter(new FileStream(path, FileMode.Create, FileAccess.ReadWrite));
+            targetWriter.Write(head1);
+            foreach (var stock in stocks)
+            {
+                string code = stock.Code;
+                if (int.Parse(code) < 600000) code = "SZ" + code;
+                else code = "SH" + code;
+                targetWriter.Write(code.ToCharArray());
+                targetWriter.Write(tail);
+            }
+            targetWriter.Flush();
+            targetWriter.Close();
+        }
+
+        public static void OrganizeSelfSelectedStocksDZH(IEnumerable<Stock> stocks)
+        {
+            uint[] latestDay = new uint[8];
+            foreach (var stock in stocks)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    if (stock.DayLines.Count <= i) break;
+                    var date = stock.DayLines[stock.DayLines.Count - 1 - i].Date;
+                    latestDay[i] = DateLargerThan(date, latestDay[i]) ? date : latestDay[i];
+                }
+            }
+
+            List<Stock>[] list = new List<Stock>[8];
+            for (int i = 0; i < 8; i++)
+            {
+                list[i] = new List<Stock>();
+                foreach (var stock in stocks)
+                {
+                    var count = stock.DayLines.Count;
+                    if (count <= i) continue;
+                    for (int j = i; j >= 0; j--)
+                    {
+                        if (stock.DayLines.Count < j + 2) break;
+                        if (DateLargerThan(stock.DayLines[count - 1 - j].Date, latestDay[i])) break;
+                        if (stock.DayLines[count - 1 - j].Date == latestDay[i])
+                        {
+                            if (Math.Abs(stock.DayLines[count - 1 - j].Close - LimitUp(stock.DayLines[count - 1 - j - 1].Close))
+                                / stock.DayLines[count - 1 - j - 1].Close < 0.001)
+                                list[i].Add(stock);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < 6; i++)
+            {
+                WriteStocksToSelfblockDZH(list[i], 7 - i);
+            }
+
+            LinkedList<Stock> stocksToWrite = new LinkedList<Stock>();
+            for (int i = 1; i < 8; i++)
+            {
+                for (int j = list[i].Count - 1; j >= 0; j--)
+                {
+                    if (!stocksToWrite.Contains(list[i][j])) stocksToWrite.AddFirst(list[i][j]);
+                }
+            }
+
+            WriteStocksToSelfblockDZH(stocksToWrite, 1);
+
+
+        }
+
+        public static float LimitUp(float price)
+        {
+            double x = price * 1.10;
+            x = x * 100 + 0.5;
+            return (float)(Math.Floor(x) / 100);
         }
     }
 }

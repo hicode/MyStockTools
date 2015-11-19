@@ -41,24 +41,18 @@ namespace AnalyzePastData
             //analyze.StartAnalyze();
 
 
+
+
             //Cursor = Cursors.Wait;
-            //var kLineGraph = new DayLineGraph();
-            //kLineGraph.Show();
+            //uint startDate = Utilities.DateToUint(2015, 10, 1);
+            //uint endDate = Utilities.DateToUint(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+            //var stocks = Utilities.getStocks(startDate, endDate);
+            //var test = new StocksFilter(stocks);
+            //test.GetUpDown(3, 2, 0.15f, 0.05f);
+            //test.GetUpDown(3, 0, 0.20f, 0f);
+            //test.OutputResult();
             //Cursor = null;
-
-
-            Cursor = Cursors.Wait;
-            uint startDate = Utilities.DateToUint(2015, 10, 1);
-            uint endDate = Utilities.DateToUint(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-            var stocks = Utilities.getStocks(startDate, endDate);
-            var test = new StocksFilter(stocks);
-            test.GetUpDown(3, 2, 0.15f, 0.02f);
-            //test.GetUpDown(3, 0, 0.15f, 0f);
-            test.OutputResult();
-            Cursor = null;
-            MessageBox.Show("Done");
-
-
+            //MessageBox.Show("Done");
 
         }
 
@@ -67,8 +61,27 @@ namespace AnalyzePastData
             Cursor = Cursors.Wait;
             Utilities.ParseHistoryFilesToOneFile();
             Cursor = null;
-            MessageBox.Show("done");
+            MessageBox.Show("Done");
 
+        }
+
+        private void btnKLine_Click(object sender, RoutedEventArgs e)
+        {
+            Cursor = Cursors.Wait;
+            var kLineGraph = new DayLineGraph();
+            kLineGraph.Show();
+            Cursor = null;
+
+        }
+
+        private void btnDZHBlocks_Click(object sender, RoutedEventArgs e)
+        {
+            Cursor = Cursors.Wait;
+            uint startDate = Utilities.DateToUint(2014, 10, 1);
+            uint endDate = Utilities.DateToUint(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+            var stocks = Utilities.getStocks(startDate, endDate);
+            Utilities.OrganizeSelfSelectedStocksDZH(stocks);
+            Cursor = null;
         }
     }
 }

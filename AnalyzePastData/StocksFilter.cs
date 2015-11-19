@@ -24,7 +24,7 @@ namespace AnalyzePastData
             }
         }
 
-        public void GetUpDown(int up,int down ,float upPercent,float downPercent)
+        public void GetUpDown(int up, int down, float upPercent, float downPercent)
         {
             foreach (var stock in stocks)
             {
@@ -39,7 +39,7 @@ namespace AnalyzePastData
 
         public void OutputResult()
         {
-            Utilities.WriteStocksToSelfblock(selectStocks);
+            Utilities.WriteStocksToSelfblockDZH(selectStocks, 8);
         }
     }
 }
