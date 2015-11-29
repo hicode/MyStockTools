@@ -75,8 +75,10 @@ namespace AnalyzePastData
 
             for (int i = 0; i < stocks.Count; i++)
             {
-                max = Math.Max(max, stocks[i].DayLines.Count);
-                var date = stocks[i].DayLines[stocks[i].DayLines.Count - 1].Date;
+                var count = stocks[i].DayLines.Count;
+                if (count == 0) continue;
+                max = Math.Max(max, count);
+                var date = stocks[i].DayLines[count - 1].Date;
                 latestDay = Utilities.DateLargerThan(date, latestDay) ? date : latestDay;
             }
             InitializeComponent();

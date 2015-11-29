@@ -68,6 +68,9 @@
       <DependentUpon>DayLineGraph.xaml</DependentUpon>
     </Compile>
     <Compile Include="Stock.cs" />
+    <Compile Include="StockFilterSelectWindow.xaml.cs">
+      <DependentUpon>StockFilterSelectWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="StockListData.cs" />
     <Compile Include="StocksFilter.cs" />
     <Compile Include="Utilities.cs" />
@@ -87,6 +90,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="StockFilterSelectWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

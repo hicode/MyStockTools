@@ -35,12 +35,12 @@ namespace AnalyzePastData
         /// <param name="e"></param>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //uint startDate = AnalyzeStocks.DateToUint(2007, 10, 1);
-            //uint endDate = AnalyzeStocks.DateToUint(2015, 6, 9);
+            //Cursor = Cursors.Wait;
+            //uint startDate = Utilities.DateToUint(2007, 10, 1);
+            //uint endDate = Utilities.DateToUint(2015, 11, 20);
             //AnalyzeStocks analyze = new AnalyzeStocks(startDate, endDate);
             //analyze.StartAnalyze();
-
-
+            //Cursor = null;
 
 
             //Cursor = Cursors.Wait;
@@ -49,11 +49,14 @@ namespace AnalyzePastData
             //var stocks = Utilities.getStocks(startDate, endDate);
             //var test = new StocksFilter(stocks);
             //test.GetUpDown(3, 2, 0.15f, 0.05f);
-            //test.GetUpDown(3, 0, 0.20f, 0f);
+            //test.GetUpDown(3, 3, 0.20f, 0.10f);
             //test.OutputResult();
             //Cursor = null;
             //MessageBox.Show("Done");
 
+
+            var selectWin = new StockFilterSelectWindow();
+            selectWin.Show();
         }
 
         private void btnRestoreData_Click(object sender, RoutedEventArgs e)
@@ -82,6 +85,7 @@ namespace AnalyzePastData
             var stocks = Utilities.getStocks(startDate, endDate);
             Utilities.OrganizeSelfSelectedStocksDZH(stocks);
             Cursor = null;
+            MessageBox.Show("Done");
         }
     }
 }
