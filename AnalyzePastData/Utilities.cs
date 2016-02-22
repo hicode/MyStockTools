@@ -133,12 +133,12 @@ namespace AnalyzePastData
         /// </summary>
         public static void ParseHistoryFilesToOneFile()
         {
-            BufferedStream target = new BufferedStream(new FileStream(@"G:\StockData\dataToAnlalyze\history.cxs", FileMode.Create, FileAccess.Write));
+            BufferedStream target = new BufferedStream(new FileStream(@"F:\StockData\dataToAnlalyze\history.cxs", FileMode.Create, FileAccess.Write));
             BinaryWriter bw = new BinaryWriter(target);
-            BufferedStream codeNameTable = new BufferedStream(new FileStream(@"G:\StockData\dataToAnlalyze\codeNameTable.txt", FileMode.Create, FileAccess.Write));
+            BufferedStream codeNameTable = new BufferedStream(new FileStream(@"F:\StockData\dataToAnlalyze\codeNameTable.txt", FileMode.Create, FileAccess.Write));
             StreamWriter tw = new StreamWriter(codeNameTable);
 
-            string path = @"G:\StockData\history";
+            string path = @"F:\StockData\history";
             var files = Directory.GetFiles(path);
             foreach (var file in files)
             {
@@ -225,7 +225,7 @@ namespace AnalyzePastData
             if (blockNumber < 1 || blockNumber > 8) throw new IndexOutOfRangeException("blockNumber should be between 1 and 8");
             byte[] head1 = { 0xa6, 0x00, 0x51, 0xff, 0x01 };
             byte[] tail = { 0x00, 0x20, 0x24, 0x01, 0x00, 0x00, 0x00, 0x00 };
-            string path = @"D:\dzh2\USERDATA\block\自选股" + blockNumber + ".BLK";
+            string path = @"C:\dzh2\USERDATA\block\自选股" + blockNumber + ".BLK";
             BinaryWriter targetWriter = new BinaryWriter(new FileStream(path, FileMode.Create, FileAccess.ReadWrite));
             targetWriter.Write(head1);
             foreach (var stock in stocks)
