@@ -34,7 +34,7 @@ namespace AnalyzePastData
         {
             List<Stock> list = new List<Stock>();
             Dictionary<int, string> map = new Dictionary<int, string>();
-            FileStream name = new FileStream(@"G:\StockData\dataToAnlalyze\codeNameTable.txt", FileMode.Open, FileAccess.Read);
+            FileStream name = new FileStream(@"F:\StockData\dataToAnlalyze\codeNameTable.txt", FileMode.Open, FileAccess.Read);
             StreamReader nameReader = new StreamReader(name);
             try
             {
@@ -51,7 +51,7 @@ namespace AnalyzePastData
             nameReader.Close();
             name.Close();
 
-            BufferedStream stocks = new BufferedStream(new FileStream(@"G:\StockData\dataToAnlalyze\history.cxs", FileMode.Open, FileAccess.Read));
+            BufferedStream stocks = new BufferedStream(new FileStream(@"F:\StockData\dataToAnlalyze\history.cxs", FileMode.Open, FileAccess.Read));
             BinaryReader br = new BinaryReader(stocks);
             while (true)
             {
@@ -300,6 +300,41 @@ namespace AnalyzePastData
             double x = price * 1.10;
             x = x * 100 + 0.5;
             return (float)(Math.Floor(x) / 100);
+        }
+
+        public static void UpdateOneDriveDZHFiles()
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                string source = @"C:\dzh2\USERDATA\block\自选股";
+                string target = @"F:\OneDrive\DZH\自选股";
+                if (i != 0)
+                {
+                    source = source + i;
+                    target = target + i;
+                }
+                source = source + ".BLK";
+                target = target + ".BLK";
+
+                BinaryReader reader = new BinaryReader(new FileStream(source, FileMode.Open, FileAccess.Read));
+                BinaryWriter writer = new BinaryWriter(new FileStream(target, FileMode.Create, FileAccess.Write));
+
+                while (true)
+                {
+                    try
+                    {
+                        byte content = reader.ReadByte();
+                        writer.Write(content);
+                    }
+                    catch (EndOfStreamException)
+                    {
+                        reader.Close();
+                        writer.Flush();
+                        writer.Close();
+                        break;
+                    }
+                }
+            }
         }
     }
 }
