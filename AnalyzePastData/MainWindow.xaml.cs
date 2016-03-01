@@ -90,7 +90,10 @@ namespace AnalyzePastData
 
         private void btnUpdateOneDrive_Click(object sender, RoutedEventArgs e)
         {
+            Cursor = Cursors.Wait;
             Utilities.UpdateOneDriveDZHFiles();
+            Cursor = null;
+            MessageBox.Show("Done");
         }
     }
 }
